@@ -1,0 +1,30 @@
+<h1>User Weighed Ranking</h1>
+<ul><li>Select weights ranging from 0-1 on each of the Categories, Dimensions and Metrics to be directed to the ranking page of you datasets</li></ul>
+
+<ul>
+	 <button mat-fab color="primary" (click)="AssembleRequest()" routerLink = "/users" style="float: right;">Rank!</button>
+	<li *ngFor="let category of posts$; let i=index"> 
+		<h1>{{category.label}} <mat-slider min="0" max="1" step="0.1" thumbLabel tickInterval="auto" [(ngModel)]="posts$[i].weight" ></mat-slider>
+		<span *ngIf="posts$[i].weight>0">{{posts$[i].weight}}</span></h1>
+		<div *ngIf="posts$[i].weight>0">
+			<ul>
+				<li *ngFor="let dimension of posts$[i].dimension; let s=index">
+					<h2>{{dimension.label}}<mat-slider min="0" max="1" step="0.1" thumbLabel tickInterval="auto" [(ngModel)]="posts$[i].dimension[s].weight"></mat-slider>
+						<span *ngIf="posts$[i].dimension[s].weight>0">{{posts$[i].dimension[s].weight}}</span></h2>
+					<div *ngIf="posts$[i].dimension[s].weight>0">
+						<ul>
+							<li *ngFor="let metric of ((posts$[i].dimension)[s]).metric; let m=index">
+								<tr>{{metric.label}}<mat-slider thumbLabel tickInterval="auto" min="0" max="1" step="0.1"  [(ngModel)]="posts$[i].dimension[s].metric[m].weight" style="float: right;"></mat-slider>
+									<div *ngIf="posts$[i].dimension[s].metric[m].weight>0">{{posts$[i].dimension[s].metric[m].weight}}</div></tr>
+							</li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</li>
+	<div *ngIf="rank">Text</div>
+	 <button mat-fab color="primary" (click)="AssembleRequest()" routerLink = "/users" style="float: right;">Rank!</button>
+</ul>
+
+

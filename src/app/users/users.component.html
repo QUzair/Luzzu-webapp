@@ -1,0 +1,28 @@
+<h1>Ranked Datasets</h1>
+<ul><li>Datasets ranked based on user weighed metrics</li></ul>
+<ul>
+	<li>
+		<form class="example-form">
+  <mat-form-field class="example-full-width">
+    <input matInput placeholder="Choose Dataset" aria-label="State" [matAutocomplete]="auto" [formControl]="stateCtrl">
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option (click)="setLabel(state.dataset)" routerLink = "/details" *ngFor="let state of filteredStates | async" [value]="state.dataset">
+        <span>{{ state.dataset.slice(7) }}</span> |
+        <strong><small>{{state.rankedValue}}</small></strong>
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</form>
+	</li>
+</ul>
+<ul>
+	<li *ngFor="let dataset of users$"> 
+		<a (click)="setLabel(dataset.dataset)" routerLink = "/details">{{dataset.dataset}}</a>
+		<ul>
+			<li><strong>{{dataset.rankedValue}}</strong></li>
+			<li><a href="{{dataset.dataset}}" target="_blank">{{dataset.dataset}}</a></li>
+		</ul>
+	</li>
+</ul>
+
+

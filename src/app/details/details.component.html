@@ -1,0 +1,68 @@
+<h1>Profile</h1>
+<ul>
+	<li><h2>{{label}}</h2></li>
+	<li>
+		<h3>Details</h3>
+		<div><h4>Number of tuples</h4>24003428924</div>
+		<div><h4>Assessment Logs</h4>24th January 2017<br>3rd March 2017</div>
+	</li>
+	<li>
+				<div *ngIf="radarChart">
+					<canvas id="radar1">{{radarChart}}</canvas>
+				</div>
+	</li>
+</ul>
+
+
+<ul>
+	
+</ul>
+
+
+<ul>
+	<li>
+		<h3>Visualisation of Metric Over Time</h3>
+		<div>
+			<form class="example-form">
+	  			<mat-form-field class="example-full-width">
+	    			<input type="text" placeholder="Choose a metric" aria-label="Number" matInput [formControl]="myControl" [matAutocomplete]="auto">
+	    				<mat-autocomplete #auto="matAutocomplete">
+	      					<mat-option (click)=metricVis(option) *ngFor="let option of metricURIs" [value]="option">
+	        					{{ option.slice(30) }}
+	      					</mat-option>
+	   					 </mat-autocomplete>
+	  			</mat-form-field>
+			</form>
+		</div>
+		<ul>
+			<li>
+				<div *ngIf="chart">
+					<canvas id="canvas">{{chart}}</canvas>
+				</div>
+			</li>
+		</ul>
+	</li>
+</ul>
+
+
+<ul>
+	<ul><li (click)="showMetrics=!showMetrics"><h3>Metrics</h3></li></ul>
+	<div *ngIf="showMetrics">
+		<li  *ngFor="let metric of quality_metrics; let i=index" (click)="quality_metrics[i].show=!quality_metrics[i].show">{{metric.name}}
+			<h5>{{metric.latestValue}}</h5>
+			<mat-progress-bar mode="determinate" [value]="quality_metrics[i].latestValue"></mat-progress-bar>
+			
+			<div *ngIf="quality_metrics[i].show">
+				<ul>
+				<h3>Mitigation measures</h3>
+				We can avoid such behaviour of the metrics by carefully taking the open world
+				assumption into account when defining the metric. But this leads us to three possibilities
+				for defining metrics,
+				1. to base the value on the ontology as it is,
+				2. to measure an upper bound, or
+				3. to measure a lower bound.
+			</ul>
+			</div>
+		</li>
+	</div>
+</ul>

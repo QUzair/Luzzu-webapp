@@ -1,0 +1,34 @@
+<nav>
+	<ul>
+		<li>
+			<a routerLink="" [class.activated]="currentUrl=='/'">
+				<i class="material-icons">home</i>
+				
+			</a>
+		</li>
+		<li>
+			<a routerLink="users" [class.activated]="currentUrl=='/users'">
+				<i class="material-icons">supervised_user_circle</i>
+				
+			</a>
+		</li>
+
+		<li>
+			<a routerLink="posts" [class.activated]="currentUrl=='/posts'">
+				<i class="material-icons">message</i>
+
+			</a>
+		</li>
+		<li>
+			<a routerLink="visualise" [class.activated]="currentUrl=='/visualise'">
+				<i class="material-icons">signal_cellular_alt</i>
+			</a>
+		</li>
+		<li>
+			<a routerLink="assess" [class.activated]="currentUrl=='/assess'">
+				<i class="material-icons">create</i>
+			</a>
+		</li>
+	</ul>
+</nav>
+
