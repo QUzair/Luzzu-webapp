@@ -19,6 +19,11 @@ import 'hammerjs';
 import { AssessComponent } from './assess/assess.component';
 import { VisualiseComponent } from './visualise/visualise.component';
 import { HomeComponent } from './home/home.component';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { AssessmentStatsComponent } from './assessment-stats/assessment-stats.component';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
+
 
 
 
@@ -32,7 +37,8 @@ import { HomeComponent } from './home/home.component';
     AssessComponent,
     VisualiseComponent,
     HomeComponent,
-    DataTableComponent
+    DataTableComponent,
+    AssessmentStatsComponent
   ],
   imports: [
     BrowserModule,
@@ -43,7 +49,10 @@ import { HomeComponent } from './home/home.component';
     LayoutModule,
     FormsModule,
     MatProgressBarModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatTooltipModule,
+    MatCheckboxModule,
+    MatSnackBarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

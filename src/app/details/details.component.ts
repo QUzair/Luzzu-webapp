@@ -29,6 +29,12 @@ export class DetailsComponent implements OnInit {
   showMetrics = false
   chart = []
   radarChart = []
+  barChart = []
+  lodDataService = []
+  labelMetrics = []
+  lodData = []
+  rlabels1 = []
+  rdata1 = []
   constructor(private data: DataService, private vdata: VDataService) {
   	
    }
@@ -38,6 +44,27 @@ export class DetailsComponent implements OnInit {
   	this.data.getProfile(this.user$).subscribe(
   		data =>this.user$ = data
   	)
+
+    this.data.getLODdata().subscribe((res)=>{
+      this.lodDataService = res
+      console.log(this.lodDataService)
+      console.log(this.quality_metrics)
+      let loddata_temp = []
+      for(let f in this.quality_metrics){
+            for(let s in this.lodDataService){
+              //console.log(`${this.quality_metrics[f].name} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
+              if(this.quality_metrics[f].name===this.lodDataService[s].name){
+                console.log(`${this.quality_metrics[f].name} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
+                loddata_temp.push(this.lodDataService[s].mean)
+              }
+            }
+          }
+          this.lodData=loddata_temp
+          console.log(this.lodData)
+          console.log(loddata_temp)
+          this.loadRadar(this.rlabels1,this.rdata1,this.lodData)
+          this.loadBar(this.rlabels1,this.rdata1,this.lodData)
+    })
 
     this.label = this.data.datasetLabel
     console.log(this.data.datasetLabel)
@@ -70,24 +97,25 @@ export class DetailsComponent implements OnInit {
     this.loadVis(this.label,arr)
   }
 
-
   loadMetrics(){
         this.vdata.vsQuality(this.label).subscribe(
       (data)=>{
         this.quality_metrics = data.metrics
         console.log(this.quality_metrics)
         let lodData = []
-        let rlabels = this.quality_metrics.map(res=>res.name)
-        let rdata = this.quality_metrics.map((res)=>{
+        this.rlabels1 = this.quality_metrics.map((res)=>{
+          return res.name
+        })
+        this.rdata1 = this.quality_metrics.map((res)=>{
           lodData.push(Math.floor(Math.random()*(101-50))+50)
           if(res.latestValue<=100) return res.latestValue
           else return 50
-
         })
 
-        console.log(`rlabels: ${rlabels}`)
-        console.log(`rdata: ${rdata}`)
-        this.loadRadar(rlabels,rdata,lodData)
+        this.labelMetrics = this.rdata1
+        console.log(`rlabels: ${this.rlabels1.length} ${this.rlabels1}`)
+        console.log(`rdata: ${this.rdata1}`)
+        
 
 
         this.quality_metrics.sort(function(a, b){
@@ -98,6 +126,9 @@ export class DetailsComponent implements OnInit {
             return 1
           return 0 //default return value (no sorting)
         })
+        console.log(this.lodDataService)
+
+          
 
         for(let l in this.quality_metrics){
               Object.defineProperty(this.quality_metrics[l],'show',{
@@ -188,10 +219,59 @@ export class DetailsComponent implements OnInit {
                       "labels":rlabels,
                       "datasets":[
                         {
-                          "label":"My First Dataset","data":rdata,
-                          "fill":true,"backgroundColor":"rgba(255, 99, 132, 0.2)","borderColor":"rgb(255, 99, 132)",
-                          "pointBackgroundColor":"rgb(255, 99, 132)","pointBorderColor":"#fff","pointHoverBackgroundColor":"#fff",
-                          "pointHoverBorderColor":"rgb(255, 99, 132)"},
+                          "label":this.label.slice(7),"data":rdata,
+                          "fill":true,"backgroundColor":"rgba(255, 99, 132, 0.2)",
+                          "borderColor":"rgb(255, 99, 132)",
+                          "pointBackgroundColor":"rgb(255, 99, 132)",
+                          "pointBorderColor":"#fff",
+                          "pointHoverBackgroundColor":"#fff",
+                          "pointHoverBorderColor":"rgb(255, 99, 132)"
+                        },
+
+                        {
+                          "label":"LOD Average Data",
+                          "data":loddata,
+                          "fill":true,
+                          "backgroundColor":"rgba(54, 162, 235, 0.2)",
+                          "borderColor":"rgb(54, 162, 235)",
+                          "pointBackgroundColor":"rgb(54, 162, 235)",
+                          "pointBorderColor":"#fff",
+                          "pointHoverBackgroundColor":"#fff",
+                          "pointHoverBorderColor":"rgb(54, 162, 235)"
+                        }]
+                     },
+                  "options":
+                    {
+                      "elements":
+                        {
+                          "line":
+                            {
+                              "tension":0,
+                               "borderWidth":3
+                            }
+                        }
+                    }
+              })
+
+  }
+
+    loadBar(rlabels,rdata,loddata){
+              this.barChart = new Chart('bar1',
+                {
+                  "type":"bar",
+                  "data":
+                    {
+                      "labels":rlabels,
+                      "datasets":[
+                        {
+                          "label":this.label.slice(7),"data":rdata,
+                          "fill":true,"backgroundColor":"rgba(255, 99, 132, 0.2)",
+                          "borderColor":"rgb(255, 99, 132)",
+                          "pointBackgroundColor":"rgb(255, 99, 132)",
+                          "pointBorderColor":"#fff",
+                          "pointHoverBackgroundColor":"#fff",
+                          "pointHoverBorderColor":"rgb(255, 99, 132)"
+                        },
 
                         {
                           "label":"LOD Average Data",

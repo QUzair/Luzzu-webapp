@@ -7,9 +7,16 @@
 		<div><h4>Assessment Logs</h4>24th January 2017<br>3rd March 2017</div>
 	</li>
 	<li>
-				<div *ngIf="radarChart">
-					<canvas id="radar1">{{radarChart}}</canvas>
-				</div>
+		<h3>Radar Chart</h3>
+		<div *ngIf="radarChart">
+			<canvas id="radar1">{{radarChart}}</canvas>
+		</div>
+	</li>
+	<li>
+		<h3>Bar Chart</h3>
+		<div *ngIf="barChart">
+			<canvas id="bar1">{{barChart}}</canvas>
+		</div>
 	</li>
 </ul>
 
@@ -48,21 +55,17 @@
 <ul>
 	<ul><li (click)="showMetrics=!showMetrics"><h3>Metrics</h3></li></ul>
 	<div *ngIf="showMetrics">
-		<li  *ngFor="let metric of quality_metrics; let i=index" (click)="quality_metrics[i].show=!quality_metrics[i].show">{{metric.name}}
+		<div  *ngFor="let metric of quality_metrics; let i=index" (click)="quality_metrics[i].show=!quality_metrics[i].show"><li *ngIf="metric.latestValue>0 && metric.latestValue<100">{{metric.name}}
 			<h5>{{metric.latestValue}}</h5>
 			<mat-progress-bar mode="determinate" [value]="quality_metrics[i].latestValue"></mat-progress-bar>
 			
 			<div *ngIf="quality_metrics[i].show">
 				<ul>
-				<h3>Mitigation measures</h3>
-				We can avoid such behaviour of the metrics by carefully taking the open world
-				assumption into account when defining the metric. But this leads us to three possibilities
-				for defining metrics,
-				1. to base the value on the ontology as it is,
-				2. to measure an upper bound, or
-				3. to measure a lower bound.
+				<h4>Comment</h4>
+			"Provides a measure of the redundancy of the dataset at the data level, computed as the ratio of the Number of Unique Subjects to the Total Number of Subjects"
 			</ul>
 			</div>
 		</li>
+		</div>
 	</div>
 </ul>

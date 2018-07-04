@@ -1,30 +1,56 @@
 <h1>User Weighed Ranking</h1>
-<ul><li>Select weights ranging from 0-1 on each of the Categories, Dimensions and Metrics to be directed to the ranking page of you datasets</li></ul>
+<ul>
+	<li>
+		Select weights ranging from 0-1 on each of the Categories, Dimensions and Metrics to be directed to the ranking page of you datasets
+	</li>
+		<mat-radio-group class="example-radio-group" [(ngModel)]="rankingType">
+			Rank by:
+			<li>
+		  <mat-radio-button class="example-radio-button" *ngFor="let rankT of ranks" [value]="rankT">
+		    {{rankT}}
+		  </mat-radio-button>
+		  </li>
+		</mat-radio-group>		
+</ul>
+
+<div *ngIf="CategoryAdded()">
+	<ul>
+		<li>
+			<font color="#233D4D">Everything adds up!</font>
+			<button mat-fab color="primary" (click)="AssembleR()" routerLink="/users" style="float: right;">Rank!</button>
+		</li>
+			
+	</ul>
+</div>
 
 <ul>
-	 <button mat-fab color="primary" (click)="AssembleRequest()" routerLink = "/users" style="float: right;">Rank!</button>
+	<div *ngIf="rankingType==='Categories' || rankingType==='Dimensions' || rankingType==='Metrics'">
 	<li *ngFor="let category of posts$; let i=index"> 
-		<h1>{{category.label}} <mat-slider min="0" max="1" step="0.1" thumbLabel tickInterval="auto" [(ngModel)]="posts$[i].weight" ></mat-slider>
+		<h1><font color="#233D4D">{{category.label}}</font> <mat-slider class="slider" min="0" max="1" step="0.05" thumbLabel tickInterval="auto" [(ngModel)]="posts$[i].weight" ></mat-slider>
 		<span *ngIf="posts$[i].weight>0">{{posts$[i].weight}}</span></h1>
 		<div *ngIf="posts$[i].weight>0">
 			<ul>
+				<div *ngIf="rankingType===('Dimensions') || rankingType===('Metrics')">
 				<li *ngFor="let dimension of posts$[i].dimension; let s=index">
-					<h2>{{dimension.label}}<mat-slider min="0" max="1" step="0.1" thumbLabel tickInterval="auto" [(ngModel)]="posts$[i].dimension[s].weight"></mat-slider>
+					<h2><font color="#579C87">{{dimension.label}}</font><mat-slider class="slider" min="0" [max]="category.weight" step="0.05" thumbLabel tickInterval="auto" [(ngModel)]="posts$[i].dimension[s].weight"></mat-slider>
 						<span *ngIf="posts$[i].dimension[s].weight>0">{{posts$[i].dimension[s].weight}}</span></h2>
 					<div *ngIf="posts$[i].dimension[s].weight>0">
 						<ul>
+							<div *ngIf="rankingType==='Metrics'">
 							<li *ngFor="let metric of ((posts$[i].dimension)[s]).metric; let m=index">
-								<tr>{{metric.label}}<mat-slider thumbLabel tickInterval="auto" min="0" max="1" step="0.1"  [(ngModel)]="posts$[i].dimension[s].metric[m].weight" style="float: right;"></mat-slider>
+								<tr ><font color="#A1C181">{{metric.label}}<mat-slider class="slider" thumbLabel tickInterval="auto" min="0" [max]="dimension.weight" step="0.05"  [(ngModel)]="posts$[i].dimension[s].metric[m].weight" style="float: right;"></mat-slider></font>
 									<div *ngIf="posts$[i].dimension[s].metric[m].weight>0">{{posts$[i].dimension[s].metric[m].weight}}</div></tr>
 							</li>
+						</div>
 						</ul>
 					</div>
 				</li>
+			</div>
 			</ul>
 		</div>
-	</li>
-	<div *ngIf="rank">Text</div>
-	 <button mat-fab color="primary" (click)="AssembleRequest()" routerLink = "/users" style="float: right;">Rank!</button>
+	</li> 
+</div>
 </ul>
+
 
 

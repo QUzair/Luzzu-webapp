@@ -1,16 +1,66 @@
 <h1>Visualisation</h1>
 <h3>Visualise Multiple Datasets against multiple metrics</h3>
 
+<div class="row">
+	<div class="column">
+		<ul>
+			<li>
+				<mat-form-field class="example-full-width">
+			  		<mat-select placeholder="Datasets" [(formControl)]="datasetsForm" multiple>
+			    		<mat-option class="selecto" *ngFor="let topping of users$" [value]="topping">{{topping.dataset}}</mat-option>
+			  		</mat-select>
+				</mat-form-field>
+				<ul *ngFor="let d of datasetsForm.value">
+					<li>
+						{{d.dataset}}
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+
+	<div class="column">
+		<ul>
+			<li>
+				<mat-form-field class="example-full-width">
+			  		<mat-select placeholder="Metrics" [(formControl)]="metricsForm" multiple>
+			    		<mat-option *ngFor="let metric of metricURIs" [value]="metric">{{metric.label}}</mat-option>
+			  		</mat-select>
+				</mat-form-field>
+				<ul *ngFor="let m of metricsForm.value">
+					<li>
+						{{m.label}}
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+
+	<div class="column3">
+		<ul>
+				<button (click)="Visualise()" mat-fab color="primary" style="float: left;">Visualise</button>
+		</ul>
+	</div>
+
+	
+</div>
 
 <ul>
 	<li>
-		<mat-form-field>
-	  		<mat-select placeholder="Datasets" [(formControl)]="toppings" multiple>
-	    		<mat-option *ngFor="let topping of users$" [value]="topping">{{topping.dataset}}</mat-option>
-	  		</mat-select>
-		</mat-form-field>
+		<h3>Radar Graph</h3>
+	</li>
+	<li>
+			<div *ngIf="radarChartm">
+			<canvas id="radar1">{{radarChartm}}</canvas>
+		</div>
+	</li>
+	<li>
+		<h3>Bar Graph</h3>
+	</li>
+	<li>
+		<div *ngIf="barChartm">
+			<canvas id="bar1">{{barChartm}}</canvas>
+		</div>
 	</li>
 </ul>
-
-
 

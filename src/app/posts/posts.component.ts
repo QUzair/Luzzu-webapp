@@ -7,6 +7,7 @@ import { MaterialModule } from '../material.module';
 import { FormsModule} from '@angular/forms'
 import { map } from 'rxjs/operators'
 import 'hammerjs';
+import {MatRadioModule} from '@angular/material/radio';
 
 @Component({
   selector: 'app-posts',
@@ -22,8 +23,9 @@ export class PostsComponent implements OnInit {
   dat = {type:"",uri:"",weight:0};
   weight=0;
   res:Object 
-  public name = "Uzair";
   metricURIs= []
+  rankingType: string;
+  ranks: string[] = ['Categories', 'Dimensions', 'Metrics'];
 
   constructor(private data: DataService) { 
 
@@ -73,23 +75,59 @@ export class PostsComponent implements OnInit {
   	)
   }
 
+AssembleR(){
+  this.data.AssembleRequest(this.posts$,this.rankingType)
+}
+
+/*
  AssembleRequest(){
     console.log(`starting ranking...`)
     console.log(this.posts$)
     let da = this.dat
+    da.type = "category"
+    let dad = this.dat
+    let dam = this.dat
 
-    for(let c in this.posts$){  
-      da.type = "category"
-      da.uri = this.posts$[c].uri
-      da.weight = this.posts$[c].weight
-      console.log(da)
-      if(!this.request.includes(da)) this.request.push(da)  
-      console.log(this.request)
+    if(this.rankingType=='Categories'){
+      for(let c in this.posts$){  
+        da.uri = this.posts$[c].uri
+        da.weight = this.posts$[c].weight
+        console.log(da)
+        if(!this.request.includes(da)) this.request.push(da)  
+        console.log(this.request)
 
-        for(let d in this.posts$[c].dimension){ 
-          for(let m in this.posts$[c].dimension[d].metric){
+          for(let d in this.posts$[c].dimension){ 
+            for(let m in this.posts$[c].dimension[d].metric){
+            }
           }
-        }
+       }
+     }
+
+    else if(this.rankingType=='Dimensions'){
+      for(let c in this.posts$){  
+          for(let d in this.posts$[c].dimension){ 
+            da.type = "dimension"
+            da.uri = this.posts$[c].dimension[d].uri
+            da.weight = this.posts$[c].dimension[d].weight
+            console.log(da)
+            if(!this.request.includes(da)) this.request.push(da)  
+          }
+       }
+     }
+
+    else if(this.rankingType=='Metrics'){
+      for(let c in this.posts$){  
+          for(let d in this.posts$[c].dimension){ 
+            for(let m in this.posts$[c].dimension[d].metric){
+                da.type = "metric"
+                da.uri = this.posts$[c].dimension[d].metric[m].uri
+                da.weight = this.posts$[c].dimension[d].metric[m].weight
+                console.log(da)
+                if(!this.request.includes(da)) this.request.push(da)  
+                console.log(this.request)
+            }
+          }
+       }
      }
      
       console.log(this.request)
@@ -104,17 +142,57 @@ export class PostsComponent implements OnInit {
            }
         )
   }
+*/
+  CategoryAdded(){
+    let catsum=0
+    let dimsum=0
+    let metsum=0
+
+    for(let c in this.posts$){  
+       catsum+=this.posts$[c].weight
+      for(let d in this.posts$[c].dimension){ 
+        dimsum+=this.posts$[c].dimension[d].weight
+          for(let m in this.posts$[c].dimension[d].metric){
+            metsum+=this.posts$[c].dimension[d].metric[m].weight
+          }
+        }
+    }
+    if(this.rankingType=='Categories'){
+      if(catsum==1){
+                console.log(catsum)
+        console.log(dimsum)
+        console.log(metsum)
+        return true
+      }
+      else return false
+    }
+
+    if(this.rankingType=='Dimensions'){
+      if(catsum==1 && dimsum==1){
+        console.log(catsum)
+        console.log(dimsum)
+        console.log(metsum)
+        return true
+      }
+      else return false
+    }
+    if(this.rankingType=='Metrics'){
+      if(catsum==1 && dimsum==1 && metsum==1){
+        console.log(catsum)
+        console.log(dimsum)
+        console.log(metsum)
+        return true
+      }
+      else return false
+    }
 
 
   }
 
 
+  }
 
 
-
-    
-            
-      //   }
 
 
 

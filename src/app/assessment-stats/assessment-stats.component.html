@@ -1,0 +1,118 @@
+<h1>Assessment Statistics</h1>
+
+<ul>
+	<li>
+		<h2 style="color:green;">Successful</h2>
+		<table mat-table [dataSource]="successful" class="mat-elevation-z8">
+
+  <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+  <!-- Position Column -->
+  <ng-container matColumnDef="Request-ID">
+    <th mat-header-cell *matHeaderCellDef> Request ID </th>
+    <td mat-cell *matCellDef="let element"> {{element["Request-ID"]}} </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="Dataset-PLD">
+    <th mat-header-cell *matHeaderCellDef> Dataset PLD </th>
+    <td mat-cell *matCellDef="let element"><a (click)="setLabel(element['Dataset-PLD'])" routerLink = "/details">{{element["Dataset-PLD"]}}</a>  </td>
+  </ng-container>
+
+  <!-- Weight Column -->
+  <ng-container matColumnDef="Assessment-Date">
+    <th mat-header-cell *matHeaderCellDef> Assessment Date </th>
+    <td mat-cell *matCellDef="let element"> {{element["Assessment-Date"]}} </td>
+  </ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="Dataset-Location">
+    <th mat-header-cell *matHeaderCellDef> Location </th>
+    <td mat-cell *matCellDef="let element"> {{element["Dataset-Location"]}} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+
+</li>
+</ul>
+
+<ul>
+	<li>
+		<h2 style="color:orange;">Pending</h2>
+		<table mat-table [dataSource]="pending" class="mat-elevation-z8">
+
+  <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+  <!-- Position Column -->
+  <ng-container matColumnDef="Request-ID">
+    <th mat-header-cell *matHeaderCellDef> Request ID </th>
+    <td mat-cell *matCellDef="let element"> {{element["Request-ID"]}} </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="Dataset-PLD">
+    <th mat-header-cell *matHeaderCellDef> Dataset PLD </th>
+    <td mat-cell *matCellDef="let element"> {{element["Dataset-PLD"]}} </td>
+  </ng-container>
+
+  <!-- Weight Column -->
+  <ng-container matColumnDef="Assessment-Date">
+    <th mat-header-cell *matHeaderCellDef> Assessment Date </th>
+    <td mat-cell *matCellDef="let element"> {{element["Assessment-Date"]}} </td>
+  </ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="Dataset-Location">
+    <th mat-header-cell *matHeaderCellDef> Location </th>
+    <td mat-cell *matCellDef="let element"> {{element["Dataset-Location"]}} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+
+</li>
+</ul>
+
+<ul>
+	<li>
+		<h2 style="color:red;">Failed</h2>
+		<table mat-table [dataSource]="failed" class="mat-elevation-z8">
+
+  <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+  <!-- Position Column -->
+  <ng-container matColumnDef="Request-ID">
+    <th mat-header-cell *matHeaderCellDef> Request ID </th>
+    <td mat-cell *matCellDef="let element"> {{element["Request-ID"]}} </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="Dataset-PLD">
+    <th mat-header-cell *matHeaderCellDef> Dataset PLD </th>
+    <td mat-cell *matCellDef="let element"> {{element["Dataset-PLD"]}} </td>
+  </ng-container>
+
+  <!-- Weight Column -->
+  <ng-container matColumnDef="Assessment-Date">
+    <th mat-header-cell *matHeaderCellDef> Assessment Date </th>
+    <td mat-cell *matCellDef="let element"> {{element["Assessment-Date"]}} </td>
+  </ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="Dataset-Location">
+    <th mat-header-cell *matHeaderCellDef> Location </th>
+    <td mat-cell *matCellDef="let element"> {{element["Dataset-Location"]}} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+
+</li>
+</ul>

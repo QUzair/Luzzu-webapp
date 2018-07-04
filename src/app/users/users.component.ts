@@ -34,14 +34,18 @@ export class UsersComponent implements OnInit {
 
   ngOnInit() {
   	//Accessing properties, subscribe to the observable and bound the data
-  	this.data.getRanking().subscribe(
+  	/*this.data.getRanking().subscribe(
       (data)=>{
         this.users$ = data
         console.log(this.users$)
         this.states = this.users$
       }
-    )
+    )*/
     console.log(this.users$)
+
+    setInterval(() => {
+    this.update(); 
+  }, 5000);
     
   }
 
@@ -53,6 +57,11 @@ export class UsersComponent implements OnInit {
   filterStates(name: string) {
     return this.states.filter(state =>
       state.dataset.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  }
+
+  update(){
+    this.users$ = this.data.rankedUsers
+    this.states = this.users$
   }
 
 }

@@ -38,6 +38,7 @@ vstime(label, metrics:string[]): Observable<any> {
   );
 }
 
+//http://0.0.0.0:8080/Luzzu/v4/assessment/compute
 
 vsQuality(label): Observable<any> {
   const body = new HttpParams()
@@ -50,5 +51,28 @@ vsQuality(label): Observable<any> {
         .set('Content-Type', 'application/x-www-form-urlencoded')
     }
   );
+  }
+
+  LoadAssessMetrics(){
+    return this._http.get('http://0.0.0.0:8080/Luzzu/framework/web/get/configured/metrics')
+  }
+
+Assess(dslocation,qr,mConfig,pld,sparql): Observable<any> {
+  const body = new HttpParams()
+    .set('Dataset-Location', dslocation)
+    .set('Quality-Report-Required',qr)
+    .set('Metrics-Configuration',mConfig)
+    .set('Dataset-PLD',pld)
+    .set('Is-Sparql-Endpoint',sparql);
+
+  return this._http.post('http://0.0.0.0:8080/Luzzu/v4/assessment/compute',
+    body.toString(),
+    {
+      headers: new HttpHeaders()
+        .set('Content-Type', 'application/x-www-form-urlencoded')
+    }
+  );
+  }
 }
-}
+
+
