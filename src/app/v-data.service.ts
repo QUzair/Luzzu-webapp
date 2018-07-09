@@ -20,9 +20,6 @@ export class VDataService {
 
   constructor(private _http: HttpClient) {}
 
-  body_vstime = {dataset:"http://dbpedia.org/",
-metrics:["http://purl.org/eis/vocab/dqm#RDFAvailabilityMetric","http://purl.org/eis/vocab/dqm#RDFAvailabilityMetric","http://purl.org/eis/vocab/dqm#DifferentSerialisationsMetric","http://purl.org/eis/vocab/dqm#CompatibleDatatype","http://purl.org/eis/vocab/dqm#UsageOfDeprecatedClassesOrProperties","http://purl.org/eis/vocab/dqm#ValidIFPUsageMetric","http://purl.org/eis/vocab/dqm#ExtensionalConcisenessMetric","http://purl.org/eis/vocab/dqm#MisplacedClassesOrPropertiesMetric","http://purl.org/eis/vocab/dqm#HighThroughputMetric","http://purl.org/eis/vocab/dqm#OntologyHijackingMetric","http://purl.org/eis/vocab/dqm#UntypedLiteralsMetric","http://purl.org/eis/vocab/dqm#EndPointAvailabilityMetric","http://purl.org/eis/vocab/dqm#EntitiesAsMembersOfDisjointClassesMetric","http://purl.org/eis/vocab/dqm#MisusedOwlDatatypeOrObjectPropertiesMetric","http://purl.org/eis/vocab/dqm#LowLatencyMetric","http://purl.org/eis/vocab/dqm#UsageOfIncorrectDomainOrRangeDatatypesMetric","http://purl.org/eis/vocab/dqm#UndefinedClassesAndPropertiesMetric","http://purl.org/eis/vocab/dqm#ScalabilityOfDataSourceMetric"]}
-
 vstime(label, metrics:string[]): Observable<any> {
   const body = new HttpParams()
     .set('dataset', label)

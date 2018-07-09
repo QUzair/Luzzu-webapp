@@ -11,6 +11,9 @@ import { Chart } from 'chart.js';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {FormControl} from '@angular/forms';
 import {map, startWith} from 'rxjs/operators';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import { MetricDialogComponent } from '../metric-dialog/metric-dialog.component';
+
 
 @Component({
   selector: 'app-details',
@@ -20,7 +23,6 @@ import {map, startWith} from 'rxjs/operators';
 export class DetailsComponent implements OnInit {
 
   myControl: FormControl = new FormControl();
-	user$: Object;
   posts$: Object
   label = "No profile selected";
   quality_metrics = []
@@ -35,40 +37,16 @@ export class DetailsComponent implements OnInit {
   lodData = []
   rlabels1 = []
   rdata1 = []
-  constructor(private data: DataService, private vdata: VDataService) {
+  animal: "Dog"
+  name: "Uzair";
+  constructor(private data: DataService, private vdata: VDataService, public dialog: MatDialog) {
   	
    }
 
   ngOnInit() {
 
-  	this.data.getProfile(this.user$).subscribe(
-  		data =>this.user$ = data
-  	)
+    this.data.Current_Label.subscribe(res => this.label = res)
 
-    this.data.getLODdata().subscribe((res)=>{
-      this.lodDataService = res
-      console.log(this.lodDataService)
-      console.log(this.quality_metrics)
-      let loddata_temp = []
-      for(let f in this.quality_metrics){
-            for(let s in this.lodDataService){
-              //console.log(`${this.quality_metrics[f].name} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
-              if(this.quality_metrics[f].name===this.lodDataService[s].name){
-                console.log(`${this.quality_metrics[f].name} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
-                loddata_temp.push(this.lodDataService[s].mean)
-              }
-            }
-          }
-          this.lodData=loddata_temp
-          console.log(this.lodData)
-          console.log(loddata_temp)
-          this.loadRadar(this.rlabels1,this.rdata1,this.lodData)
-          this.loadBar(this.rlabels1,this.rdata1,this.lodData)
-    })
-
-    this.label = this.data.datasetLabel
-    console.log(this.data.datasetLabel)
-    console.log(`QualityURIS ${this}`)
 
     this.data.getFacets()
     .subscribe(
@@ -88,7 +66,6 @@ export class DetailsComponent implements OnInit {
     )
 
     this.loadMetrics()
-    //this.loadRadar()
   }
 
   metricVis(option){
@@ -102,12 +79,17 @@ export class DetailsComponent implements OnInit {
       (data)=>{
         this.quality_metrics = data.metrics
         console.log(this.quality_metrics)
-        let lodData = []
+        for(let i in this.quality_metrics){
+          Object.defineProperty(this.quality_metrics[i],'weight',{
+              value: 100,
+              writable:true,
+              configurable:true
+            });
+        }
         this.rlabels1 = this.quality_metrics.map((res)=>{
           return res.name
         })
         this.rdata1 = this.quality_metrics.map((res)=>{
-          lodData.push(Math.floor(Math.random()*(101-50))+50)
           if(res.latestValue<=100) return res.latestValue
           else return 50
         })
@@ -126,9 +108,6 @@ export class DetailsComponent implements OnInit {
             return 1
           return 0 //default return value (no sorting)
         })
-        console.log(this.lodDataService)
-
-          
 
         for(let l in this.quality_metrics){
               Object.defineProperty(this.quality_metrics[l],'show',{
@@ -137,7 +116,27 @@ export class DetailsComponent implements OnInit {
               configurable:true
             });
         }
-        //this.loadVis(this.label,this.metricURIs)
+        
+      this.data.getLODdata().subscribe((res)=>{
+        this.lodDataService = res
+        console.log(this.lodDataService)
+        console.log(this.quality_metrics)
+        let loddata_temp = []
+        for(let f in this.quality_metrics){
+              for(let s in this.lodDataService){
+                //console.log(`${this.quality_metrics[f].name} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
+                if(this.quality_metrics[f].name===this.lodDataService[s].name){
+                  console.log(`${this.quality_metrics[f].name} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
+                  loddata_temp.push(this.lodDataService[s].mean)
+                }
+              }
+            }
+            this.lodData=loddata_temp
+            console.log(this.lodData)
+            console.log(loddata_temp)
+            this.loadRadar(this.rlabels1,this.rdata1,this.lodData)
+            this.loadBar(this.rlabels1,this.rdata1,this.lodData)
+    })
       } 
     )
   }
@@ -298,6 +297,19 @@ export class DetailsComponent implements OnInit {
                     }
               })
 
+  }
+
+    openDialog(): void {
+    const dialogRef = this.dialog.open(MetricDialogComponent, {
+      width: '800px',
+      data: {metrics: this.quality_metrics}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      console.log(result)
+      this.quality_metrics = result;
+    });
   }
 
 }

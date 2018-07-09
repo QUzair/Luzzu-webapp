@@ -4,9 +4,15 @@ import {FormControl} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 
-export class State {
-  constructor(public dataset: string, public graphUri: string, public rankedValue: number) {
-   }
+// export class State {
+//   constructor(public 'Dataset-PLD': string, public graphUri: string, public rankedValue: number) {
+//    }
+// }
+
+interface State {
+  "Dataset-PLD":string,
+  "Graph-URI":string,
+  "Rank-Value":number
 }
 
 @Component({
@@ -17,6 +23,7 @@ export class State {
 
 export class UsersComponent implements OnInit {
 
+  showSpinner = true
 	users$:State[]
   states: State[] = [];
   label = 'Label';
@@ -33,35 +40,20 @@ export class UsersComponent implements OnInit {
   }
 
   ngOnInit() {
-  	//Accessing properties, subscribe to the observable and bound the data
-  	/*this.data.getRanking().subscribe(
-      (data)=>{
-        this.users$ = data
-        console.log(this.users$)
-        this.states = this.users$
-      }
-    )*/
-    console.log(this.users$)
-
-    setInterval(() => {
-    this.update(); 
-  }, 5000);
+    this.data.currentRankedUsers.subscribe(res => this.users$ = res)
+    this.data.CurrentSpinner.subscribe(res => this.showSpinner = res)
     
+    console.log(this.users$)
   }
 
   setLabel(label){
-    console.log(`Sent ${label}`)
-    this.data.datasetLabel = label
+    this.data.changeLabel(label)
   }
 
   filterStates(name: string) {
     return this.states.filter(state =>
-      state.dataset.toLowerCase().indexOf(name.toLowerCase()) === 0);
-  }
-
-  update(){
-    this.users$ = this.data.rankedUsers
-    this.states = this.users$
+      state[ "Dataset-PLD"].toLowerCase().indexOf(name.toLowerCase()) === 0);
   }
 
 }
+

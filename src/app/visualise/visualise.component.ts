@@ -31,14 +31,9 @@ export class VisualiseComponent implements OnInit {
   
   constructor(private _vdata: VDataService, private data: DataService) { }
   ngOnInit() {
-
+    this.data.currentRankedUsers.subscribe(res => this.users$ = res)
     this.saveMetricURIs()
-    this.data.getRanking().subscribe(
-      (data)=>{
-        this.users$ = data
-        console.log(this.users$)
-      }
-    )
+    console.log(this.users$)
   }
 
   message(){
@@ -53,9 +48,9 @@ export class VisualiseComponent implements OnInit {
         console.log(posts$)
 
         for(let c in posts$){
-          for(let d in posts$[c].dimension){
-            for(let m in posts$[c].dimension[d].metric){
-              this.metricURIs.push((posts$[c].dimension[d].metric[m]))       
+          for(let d in posts$[c]['dimension']){
+            for(let m in posts$[c]['dimension'][d].metric){
+              this.metricURIs.push((posts$[c]['dimension'][d].metric[m]))       
             }
           }
         }
@@ -129,11 +124,11 @@ export class VisualiseComponent implements OnInit {
 
     for (let d in this.datasetsForm.value){
       let testdata  = []
-      console.log(this.datasetsForm.value[d].dataset)
+      console.log(this.datasetsForm.value[d]['Dataset-PLD'])
 
 
 
-      this._vdata.vsQuality(this.datasetsForm.value[d].dataset).subscribe(
+      this._vdata.vsQuality(this.datasetsForm.value[d]['Dataset-PLD']).subscribe(
         (res)=>{
           //console.log(res)
           //console.log(this.metricsForm.value)
@@ -161,7 +156,7 @@ export class VisualiseComponent implements OnInit {
             
           }
            //Have array of data and label of datasetß
-          console.log(`${this.datasetsForm.value[d].dataset} ${testdata}`)  
+          console.log(`${this.datasetsForm.value[d]['Dataset-PLD']} ${testdata}`)  
           let red = Math.floor(Math.random()*(255))
           let blue = Math.floor(Math.random()*(255))
           let green = Math.floor(Math.random()*(255))
@@ -177,7 +172,7 @@ export class VisualiseComponent implements OnInit {
             "pointHoverBackgroundColor":"#fff",
             "pointHoverBorderColor":`rgba(${red}, ${green}, ${blue})`
           };
-          tmp.label= this.datasetsForm.value[d].dataset
+          tmp.label= this.datasetsForm.value[d]['Dataset-PLD']
           tmp.data = testdata
           this.rdatasets.push(tmp) 
           //console.log(`Final ${this.rdatasets.map(res=>{res.data; res.label})} `)
@@ -200,37 +195,17 @@ export class VisualiseComponent implements OnInit {
 
 
         })
-     
-      
     }
   }
 
    addData(chart, label, data) {
-    chart.data.labels=label;
-    chart.data.datasets=data
-    chart.update();
+     try{
+      chart.data.labels=label;
+      chart.data.datasets=data
+      chart.update();
+    }catch(err){
+      console.log(err)
+    }
 }
 
 }
-
-
-
-
-// [
-//                         {
-//                           "label":"My First Dataset","data":rdata,
-//                           "fill":true,"backgroundColor":"rgba(255, 99, 132, 0.2)","borderColor":"rgb(255, 99, 132)",
-//                           "pointBackgroundColor":"rgb(255, 99, 132)","pointBorderColor":"#fff","pointHoverBackgroundColor":"#fff",
-//                           "pointHoverBorderColor":"rgb(255, 99, 132)"},
-
-//                         {
-//                           "label":"LOD Average Data",
-//                           "data":loddata,
-//                           "fill":true,
-//                           "backgroundColor":"rgba(54, 162, 235, 0.2)",
-//                           "borderColor":"rgb(54, 162, 235)",
-//                           "pointBackgroundColor":"rgb(54, 162, 235)",
-//                           "pointBorderColor":"#fff",
-//                           "pointHoverBackgroundColor":"#fff",
-//                           "pointHoverBorderColor":"rgb(54, 162, 235)"
-//                         }]

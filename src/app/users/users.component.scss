@@ -7,3 +7,10 @@
 .example-full-width {
   width: 100%;
 }
+
+.center {
+     position: relative;
+  /* Adjust these values accordingly */
+  top: 5px;
+  left: 50%;
+}

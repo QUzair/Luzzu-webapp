@@ -53,11 +53,14 @@
 
 
 <ul>
-	<ul><li (click)="showMetrics=!showMetrics"><h3>Metrics</h3></li></ul>
+	<ul><li (click)="showMetrics=!showMetrics"><h3 position="relative">Metrics<i class="material-icons">arrow_drop_down</i></h3></li>
+		<li (click)="openDialog()"> <i class="material-icons">settings</i><button mat-button>Configure Metric Thresholds</button></li>
+	</ul>
 	<div *ngIf="showMetrics">
-		<div  *ngFor="let metric of quality_metrics; let i=index" (click)="quality_metrics[i].show=!quality_metrics[i].show"><li *ngIf="metric.latestValue>0 && metric.latestValue<100">{{metric.name}}
-			<h5>{{metric.latestValue}}</h5>
-			<mat-progress-bar mode="determinate" [value]="quality_metrics[i].latestValue"></mat-progress-bar>
+		<li>Current Value <br> <font color="#A1C181">Threshold Value</font><br> <font color="#8B008B">LOD Data Avg.</font></li>
+		<div  *ngFor="let metric of quality_metrics; let i=index" (click)="quality_metrics[i].show=!quality_metrics[i].show"><li>{{metric.name}}
+			<h5>{{metric.latestValue}}    <font color="#A1C181">{{metric.weight}}</font></h5>
+			<mat-progress-bar mode="determinate" [value]="(quality_metrics[i].latestValue/quality_metrics[i].weight)*100"></mat-progress-bar>
 			
 			<div *ngIf="quality_metrics[i].show">
 				<ul>

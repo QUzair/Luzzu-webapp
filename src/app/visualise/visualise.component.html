@@ -7,12 +7,12 @@
 			<li>
 				<mat-form-field class="example-full-width">
 			  		<mat-select placeholder="Datasets" [(formControl)]="datasetsForm" multiple>
-			    		<mat-option class="selecto" *ngFor="let topping of users$" [value]="topping">{{topping.dataset}}</mat-option>
+			    		<mat-option class="selecto" *ngFor="let topping of users$" [value]="topping">{{topping['Dataset-PLD']}}</mat-option>
 			  		</mat-select>
 				</mat-form-field>
 				<ul *ngFor="let d of datasetsForm.value">
 					<li>
-						{{d.dataset}}
+						{{d['Dataset-PLD']}}
 					</li>
 				</ul>
 			</li>

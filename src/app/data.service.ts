@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http'
+import { BehaviorSubject } from 'rxjs';
 
 interface data {
-	category: Object
+	category: Object[]
 }
+
 
 interface RankedUsers {
   ranking: Object[]
@@ -24,41 +26,37 @@ export class LOD {
    }
 }
 
+export class MT {
+  constructor(public dataset: string, public metrics: Object[]) {
+   }
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
 
+  private rankedUsers = new BehaviorSubject([]);
+  currentRankedUsers = this.rankedUsers.asObservable();
+
+  private Profile_Label = new BehaviorSubject('No label selected');
+  Current_Label = this.Profile_Label.asObservable();
+
+  private Users_Spinner = new BehaviorSubject(true);
+  CurrentSpinner = this.Users_Spinner.asObservable();
+
   constructor(private http: HttpClient) { }
-  rankedUsers = []
-  datasetLabel = "Nothing";
+
   dat = {type:"",uri:"",weight:0};
-  getDatasetLabel(){
-  	return this.datasetLabel
-  }
 
-   setDatasetLabel(label){
-  	 this.datasetLabel = label
-  }
+  standardRank = [{"type":"category","uri":"http://purl.org/eis/vocab/dqm#Contextual","weight":0.25},{"type":"category","uri":"http://purl.org/eis/vocab/dqm#Accessibility","weight":0.25},{"type":"category","uri":"http://purl.org/eis/vocab/dqm#Representational","weight":0.25},{"type":"category","uri":"http://purl.org/eis/vocab/dqm#Intrinsic","weight":0.25}]
 
-	getUsers(){
-  	return this.http.get('https://jsonplaceholder.typicode.com/users')
-  }
-
-	getProfile(id){
-  	return this.http.get('https://jsonplaceholder.typicode.com/users')
-  }
-
-//Getting Ranking Values or datasets
   getRanks(body){
-  	return this.http.post<RankedUsers>('http://0.0.0.0:8080/Luzzu/rank',body)
+  	return this.http.post<Object[]>('http://localhost:8080/Luzzu/v4/dataset/rank',body)
   }
 
-
-
-//GettingFacetoptions
 	getFacets(){
-  	return this.http.get<data>('http://0.0.0.0:8080/Luzzu/framework/web/get/facet/options')
+  	return this.http.get<data>('http://localhost:8080/Luzzu/framework/web/get/facet/options')
 	}
 
 	getRanking(){
@@ -67,6 +65,10 @@ export class DataService {
 
   getLODdata(){
   return this.http.get<LOD[]>("/assets/data/LODdata.json")
+  }
+
+  getMetricThresholdData(){
+    return this.http.get<MT[]>("/assets/data/Metrics_Threshholds.json")
   }
 
   getpending(){
@@ -132,10 +134,19 @@ export class DataService {
       
     //Send req
       return this.getRanks(JSON.stringify(request)).subscribe((res)=>{
-        console.log(res)
-        this.rankedUsers=res.ranking
+        this.rankedUsers.next(res)
+        this.Users_Spinner.next(false)
+        console.log(this.rankedUsers)
       })
        
+  }
+
+  changeLabel(newLabel: string) {
+    this.Profile_Label.next(newLabel)
+  }
+
+  getStandardRanks(){
+    return this.getRanks(this.standardRank)
   }
 
 

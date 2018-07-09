@@ -8,6 +8,7 @@ import { FormsModule} from '@angular/forms'
 import { map } from 'rxjs/operators'
 import 'hammerjs';
 import {MatRadioModule} from '@angular/material/radio';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-posts',
@@ -26,7 +27,7 @@ export class PostsComponent implements OnInit {
   metricURIs= []
   rankingType: string;
   ranks: string[] = ['Categories', 'Dimensions', 'Metrics'];
-
+  showSpinner = true;
   constructor(private data: DataService) { 
 
     }
@@ -36,17 +37,21 @@ export class PostsComponent implements OnInit {
   	this.loadfacets()
   }
 
+
+
   loadfacets(){
   	this.data.getFacets()
   	.subscribe(
   		data => {
+        this.showSpinner = false;
   			this.posts$ = (data.category)
   			console.log(this.posts$)
+        let defaultw = 1/data.category.length
 
         for(let c in this.posts$){
           console.log(`Label: ${this.posts$[c].label}`)
           Object.defineProperty(this.posts$[c],'weight',{
-            value: 0,
+            value: defaultw,
             writable:true,
             configurable:true
           });
@@ -79,70 +84,6 @@ AssembleR(){
   this.data.AssembleRequest(this.posts$,this.rankingType)
 }
 
-/*
- AssembleRequest(){
-    console.log(`starting ranking...`)
-    console.log(this.posts$)
-    let da = this.dat
-    da.type = "category"
-    let dad = this.dat
-    let dam = this.dat
-
-    if(this.rankingType=='Categories'){
-      for(let c in this.posts$){  
-        da.uri = this.posts$[c].uri
-        da.weight = this.posts$[c].weight
-        console.log(da)
-        if(!this.request.includes(da)) this.request.push(da)  
-        console.log(this.request)
-
-          for(let d in this.posts$[c].dimension){ 
-            for(let m in this.posts$[c].dimension[d].metric){
-            }
-          }
-       }
-     }
-
-    else if(this.rankingType=='Dimensions'){
-      for(let c in this.posts$){  
-          for(let d in this.posts$[c].dimension){ 
-            da.type = "dimension"
-            da.uri = this.posts$[c].dimension[d].uri
-            da.weight = this.posts$[c].dimension[d].weight
-            console.log(da)
-            if(!this.request.includes(da)) this.request.push(da)  
-          }
-       }
-     }
-
-    else if(this.rankingType=='Metrics'){
-      for(let c in this.posts$){  
-          for(let d in this.posts$[c].dimension){ 
-            for(let m in this.posts$[c].dimension[d].metric){
-                da.type = "metric"
-                da.uri = this.posts$[c].dimension[d].metric[m].uri
-                da.weight = this.posts$[c].dimension[d].metric[m].weight
-                console.log(da)
-                if(!this.request.includes(da)) this.request.push(da)  
-                console.log(this.request)
-            }
-          }
-       }
-     }
-     
-      console.log(this.request)
-      console.log("here")
-      console.log(JSON.stringify(this.request))
-      
-    //Send req
-     this.data.getRanks(JSON.stringify(this.request))
-       .subscribe(
-           data => {this.res = data
-             console.log(this.res)
-           }
-        )
-  }
-*/
   CategoryAdded(){
     let catsum=0
     let dimsum=0

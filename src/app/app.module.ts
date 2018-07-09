@@ -12,7 +12,6 @@ import { HttpClientModule }  from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
-import { DataTableComponent } from './data-table/data-table.component';
 import { MaterialModule } from './material.module';
 import { LayoutModule } from '@angular/cdk/layout';
 import 'hammerjs';
@@ -23,6 +22,8 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AssessmentStatsComponent } from './assessment-stats/assessment-stats.component';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { MetricDialogComponent } from './metric-dialog/metric-dialog.component';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 
 
 
@@ -37,8 +38,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
     AssessComponent,
     VisualiseComponent,
     HomeComponent,
-    DataTableComponent,
-    AssessmentStatsComponent
+    AssessmentStatsComponent,
+    MetricDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -53,6 +54,9 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
     MatTooltipModule,
     MatCheckboxModule,
     MatSnackBarModule
+  ],
+  entryComponents: [
+        MetricDialogComponent
   ],
   providers: [],
   bootstrap: [AppComponent]
