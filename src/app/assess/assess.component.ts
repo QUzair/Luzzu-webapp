@@ -28,6 +28,7 @@ export class AssessComponent implements OnInit {
 	      "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.consistency.MisplacedClassesOrProperties",
 	      "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.consistency.UsageOfDeprecatedClassesOrProperties"
     ]}
+    
 	pld = ''
 	dslocation = ''
 	metricsForm = new FormControl(); // Contains the desired datasets

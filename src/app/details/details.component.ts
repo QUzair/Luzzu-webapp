@@ -1,11 +1,11 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { DataService } from '../data.service';
 import { VDataService } from '../v-data.service'
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MaterialModule } from '../material.module';
-import { FormsModule} from '@angular/forms'
+import { FormsModule, Validators} from '@angular/forms'
 import 'hammerjs';
 import { Chart } from 'chart.js';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
@@ -13,6 +13,12 @@ import {FormControl} from '@angular/forms';
 import {map, startWith} from 'rxjs/operators';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import { MetricDialogComponent } from '../metric-dialog/metric-dialog.component';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MetricProfileComponent } from '../metric-profile/metric-profile.component'
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 
 @Component({
@@ -22,7 +28,25 @@ import { MetricDialogComponent } from '../metric-dialog/metric-dialog.component'
 })
 export class DetailsComponent implements OnInit {
 
-  myControl: FormControl = new FormControl();
+
+  Dimen: string[] = ['Categories', 'Dimensions', 'Metrics'];
+  //myControl: FormControl = new FormControl();
+
+  CategoriesF = new FormControl();
+  DimensionsF = new FormControl();
+
+   minForm = new FormControl('', [
+    Validators.required
+  ]);
+   maxForm = new FormControl('', [
+    Validators.required
+  ]);
+
+  showProfilePage=false
+  CatList = [] 
+  DimList = []
+  Filteredmetrics = []
+  filterMetrics = false
   posts$: Object
   label = "No profile selected";
   quality_metrics = []
@@ -39,32 +63,46 @@ export class DetailsComponent implements OnInit {
   rdata1 = []
   animal: "Dog"
   name: "Uzair";
+  AssessDates = []
+  msg:any
   constructor(private data: DataService, private vdata: VDataService, public dialog: MatDialog) {
   	
    }
 
   ngOnInit() {
-
-    this.data.Current_Label.subscribe(res => this.label = res)
-
+     this.data.CurrentMetric.subscribe((res)=> {
+      console.log(res)
+      this.msg = res
+    })
+    
+    this.data.Current_Label.subscribe((res) =>{
+      this.label = res
+      this.data.getAssessmentdates(this.label).subscribe((res)=>{
+        this.AssessDates=res
+        console.log(this.AssessDates)
+      })
+    })
 
     this.data.getFacets()
     .subscribe(
       data => {
-        this.posts$ = (data.category)
+        this.posts$ = (data.Categories)
         console.log(this.posts$)
 
         for(let c in this.posts$){
-          for(let d in this.posts$[c].dimension){
-            for(let m in this.posts$[c].dimension[d].metric){
-              this.metricURIs.push((this.posts$[c].dimension[d].metric[m].uri))       
+          this.CatList.push(this.posts$[c].Label)
+          for(let d in this.posts$[c].Dimensions){
+            this.DimList.push(this.posts$[c].Dimensions[d].Label)
+            for(let m in this.posts$[c].Dimensions[d].Metrics){
+              this.metricURIs.push((this.posts$[c].Dimensions[d].Metrics[m].URI))        
             }
           }
         }
     console.log(this.metricURIs)
+    console.log(`category list ${this.CatList}`)
+    console.log(`dimensions list ${this.DimList}`)
       }
     )
-
     this.loadMetrics()
   }
 
@@ -77,20 +115,28 @@ export class DetailsComponent implements OnInit {
   loadMetrics(){
         this.vdata.vsQuality(this.label).subscribe(
       (data)=>{
-        this.quality_metrics = data.metrics
-        console.log(this.quality_metrics)
+        console.log(data)
+        this.quality_metrics = data.Metrics
+
         for(let i in this.quality_metrics){
+          console.log(this.quality_metrics[i].Observations[0]['Value-Type'])
+          if(this.quality_metrics[i].Observations[0]['Value-Type']==="Double")
+            this.quality_metrics[i].Observations[0]['Value']=this.quality_metrics[i].Observations[0]['Value']*100
+
           Object.defineProperty(this.quality_metrics[i],'weight',{
               value: 100,
               writable:true,
               configurable:true
             });
         }
+        console.log(this.quality_metrics)
+
         this.rlabels1 = this.quality_metrics.map((res)=>{
-          return res.name
+          return res['Metric-Label']
         })
         this.rdata1 = this.quality_metrics.map((res)=>{
-          if(res.latestValue<=100) return res.latestValue
+          console.log((res['Observations'][0]).Value)
+          if((res['Observations'][0]).Value<=100) return (res['Observations'][0]).Value
           else return 50
         })
 
@@ -101,7 +147,7 @@ export class DetailsComponent implements OnInit {
 
 
         this.quality_metrics.sort(function(a, b){
-          var nameA=a.latestValue, nameB=b.latestValue
+          var nameA=(a['Observations'][0]).Value, nameB=(b['Observations'][0]).Value
           if (nameA < nameB) //sort string ascending
             return -1 
           if (nameA > nameB)
@@ -125,8 +171,8 @@ export class DetailsComponent implements OnInit {
         for(let f in this.quality_metrics){
               for(let s in this.lodDataService){
                 //console.log(`${this.quality_metrics[f].name} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
-                if(this.quality_metrics[f].name===this.lodDataService[s].name){
-                  console.log(`${this.quality_metrics[f].name} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
+                if(this.quality_metrics[f]['Metric-Label']===this.lodDataService[s].name){
+                  console.log(`${this.quality_metrics[f]['Metric-Label']} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
                   loddata_temp.push(this.lodDataService[s].mean)
                 }
               }
@@ -153,10 +199,10 @@ export class DetailsComponent implements OnInit {
           let obsValue = []
           let name = []
           for(let i in res.metrics){
-            name.push(res.metrics[i].name)
-            for(let c in res.metrics[i].lstObservations){
-              obsDate.push(res.metrics[i].lstObservations[c].observationDate)
-              obsValue.push(res.metrics[i].lstObservations[c].observationValue)
+            name.push(res.Metrics[i]['Metric-Label'])
+            for(let c in res.Metrics[i].lstObservations){
+              obsDate.push(res.Metrics[i].lstObservations[c].observationDate)
+              obsValue.push(res.Metrics[i].lstObservations[c].observationValue)
             }
           }
 
@@ -190,14 +236,21 @@ export class DetailsComponent implements OnInit {
               ]
             },
             options: {
+              scaleShowvalues:true,
               legend: {
                 display: true
               },
               scales: {
                 xAxes: [{
-                  display:true
+                  display:true,
+                  ticks:{
+                    autoSkip:false
+                  }
                 }],
                 yAxes: [{
+                  ticks:{
+                    beginAtZero:true
+                  },
                   display:true
                 }]
               }
@@ -296,7 +349,6 @@ export class DetailsComponent implements OnInit {
                         }
                     }
               })
-
   }
 
     openDialog(): void {
@@ -308,11 +360,46 @@ export class DetailsComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
       console.log(result)
-      this.quality_metrics = result;
+      if(result) this.quality_metrics = result;
     });
   }
 
+  newMetricProfile(label){
+    this.showProfilePage=true
+    //console.log(`Sending to child ${label}`)
+    this.data.changeMetricName(label)
+  }
+
+  filter(){
+    console.log('working')
+    console.log(this.minForm.value)
+    console.log(this.maxForm.value)
+    let arr = []
+
+    for(let qm in this.quality_metrics){
+      for(let c in this.CategoriesF.value){
+        if(this.CategoriesF.value[c]==this.quality_metrics[qm].Category){
+          console.log(`Found category ${this.quality_metrics[qm]}`)
+          for(let d in this.DimensionsF.value){
+            if(this.DimensionsF.value[d]==this.quality_metrics[qm].Dimension){
+              console.log(`Found dimension ${this.quality_metrics[qm]}`)
+              console.log(this.quality_metrics[qm].Observations[0].Value)
+              if(this.quality_metrics[qm].Observations[0].Value>this.minForm.value && this.quality_metrics[qm].Observations[0].Value<this.maxForm.value){
+                console.log(`Found values ${this.quality_metrics[qm]}`)
+                arr.push(this.quality_metrics[qm])
+                console.log(arr)
+              }
+            }
+          }
+        }       
+      } 
+    }
+    this.Filteredmetrics = arr
+    console.log(this.Filteredmetrics)
+  }
+
 }
+
 
 
 

@@ -21,11 +21,11 @@ export class VDataService {
   constructor(private _http: HttpClient) {}
 
 vstime(label, metrics:string[]): Observable<any> {
+    console.log(label)
+    console.log(metrics)
   const body = new HttpParams()
     .set('dataset', label)
     .set('metrics', JSON.stringify(metrics));
-
-    console.log(metrics)
   return this._http.post<Vtime>('http://0.0.0.0:8080/Luzzu/framework/web/post/visualisation/dstime',
     body.toString(),
     {
@@ -39,9 +39,9 @@ vstime(label, metrics:string[]): Observable<any> {
 
 vsQuality(label): Observable<any> {
   const body = new HttpParams()
-    .set('dataset', label);
+    .set('Dataset-PLD', label);
 
-  return this._http.post<Vtime>('http://0.0.0.0:8080/Luzzu/framework/web/post/visualisation/dsqualityvis',
+  return this._http.post<Vtime>('http://0.0.0.0:8080/Luzzu/v4/dataset/latest',
     body.toString(),
     {
       headers: new HttpHeaders()
@@ -51,7 +51,7 @@ vsQuality(label): Observable<any> {
   }
 
   LoadAssessMetrics(){
-    return this._http.get('http://0.0.0.0:8080/Luzzu/framework/web/get/configured/metrics')
+    return this._http.get('http://0.0.0.0:8080/Luzzu/v4/framework/available-metrics/')
   }
 
 Assess(dslocation,qr,mConfig,pld,sparql): Observable<any> {

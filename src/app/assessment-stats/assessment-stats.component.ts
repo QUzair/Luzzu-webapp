@@ -16,7 +16,6 @@ export class AssessmentStatsComponent implements OnInit {
   failed = []
   id 
   displayedColumns: string[] = ['Request-ID', 'Dataset-PLD', 'Assessment-Date', 'Dataset-Location'];
-  //dataSource = ELEMENT_DATA;
 
   ngOnInit() {
   	this.data.getpending().subscribe((res)=>{

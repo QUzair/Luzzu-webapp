@@ -24,6 +24,7 @@ import { AssessmentStatsComponent } from './assessment-stats/assessment-stats.co
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { MetricDialogComponent } from './metric-dialog/metric-dialog.component';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import { MetricProfileComponent } from './metric-profile/metric-profile.component';
 
 
 
@@ -39,7 +40,8 @@ import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
     VisualiseComponent,
     HomeComponent,
     AssessmentStatsComponent,
-    MetricDialogComponent
+    MetricDialogComponent,
+    MetricProfileComponent
   ],
   imports: [
     BrowserModule,

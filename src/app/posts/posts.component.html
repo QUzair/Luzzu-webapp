@@ -2,16 +2,37 @@
 <div class="center" *ngIf="showSpinner"><mat-spinner></mat-spinner></div>
 <ul>
 	<li>
+		<form>
+  			<mat-form-field class="example-full-width">
+    			<input matInput placeholder="Ranking Option" aria-label="Ranking Option" [matAutocomplete]="auto" [formControl]="rankCtrl">
+	    			<mat-autocomplete #auto="matAutocomplete">
+	     			<mat-option (click)="changeWeights(rankOption)" *ngFor="let rankOption of filteredOptions | async" [value]="rankOption.RankName">
+		        		<span>{{rankOption.RankName}}</span> |
+		        		<small>Description: {{rankOption.Description}}</small>
+	      			</mat-option>
+    			</mat-autocomplete>
+  			</mat-form-field>
+  		</form>
+	</li>
+
+	<li>
 		Select weights ranging from 0-1 on each of the Categories, Dimensions and Metrics to be directed to the ranking page of you datasets
 	</li>
 		<mat-radio-group class="example-radio-group" [(ngModel)]="rankingType">
-			Rank by:
 			<li>
-		  <mat-radio-button class="example-radio-button" *ngFor="let rankT of ranks" [value]="rankT">
-		    {{rankT}}
-		  </mat-radio-button>
-		  </li>
+			Rank by:
+			  <mat-radio-button class="example-radio-button" *ngFor="let rankT of ranks" [value]="rankT">
+			    {{rankT}}
+			  </mat-radio-button>
+		  	</li>
 		</mat-radio-group>		
+</ul>
+<ul>
+		<li *ngIf=showRankOption>
+		<h2>{{DisplayRank.RankName}}</h2>
+		<h4>{{DisplayRank.RankType}}</h4>
+		<h4>{{DisplayRank.Description}}</h4>
+	</li>
 </ul>
 
 <div *ngIf="CategoryAdded()">
@@ -19,28 +40,39 @@
 		<li>
 			<font color="#233D4D">Everything adds up!</font>
 			<button mat-fab color="primary" (click)="AssembleR()" routerLink="/users" style="float: right;">Rank!</button>
-		</li>
-			
+		</li>			
+		<li>
+			<form class="example-form">
+			<font color="#233D4D"><strong>Save Ranking Option ?</strong></font>
+		<mat-form-field class="example-full-width">
+	    	 <input matInput placeholder="Ranking Name" [formControl]="NameForm">
+	  	</mat-form-field>
+	  	<mat-form-field class="example-full-width">
+	    	 <textarea matInput placeholder="Description" [formControl]="DescriptionForm"></textarea>
+	  	</mat-form-field>
+			</form>
+			<button mat-raised-button color="accent" (click)="SavingRanking()" style="float: left;">Save</button>
+		</li>	
 	</ul>
 </div>
 
 <ul>
 	<div *ngIf="rankingType==='Categories' || rankingType==='Dimensions' || rankingType==='Metrics'">
 	<li *ngFor="let category of posts$; let i=index"> 
-		<h1><font color="#233D4D">{{category.label}}</font> <mat-slider class="slider" min="0" max="1" step="0.05" thumbLabel tickInterval="auto" [(ngModel)]="posts$[i].weight" ></mat-slider>
+		<h1><font color="#233D4D">{{category.Label}}</font> <mat-slider class="slider" min="0" max="1" step="0.05" thumbLabel tickInterval="auto" [(ngModel)]="posts$[i].weight" ></mat-slider>
 		<span *ngIf="posts$[i].weight>0">{{posts$[i].weight}}</span></h1>
 		<div *ngIf="posts$[i].weight>0">
 			<ul>
 				<div *ngIf="rankingType===('Dimensions') || rankingType===('Metrics')">
-				<li *ngFor="let dimension of posts$[i].dimension; let s=index">
-					<h2><font color="#579C87">{{dimension.label}}</font><mat-slider class="slider" min="0" [max]="category.weight" step="0.05" thumbLabel tickInterval="auto" [(ngModel)]="posts$[i].dimension[s].weight"></mat-slider>
-						<span *ngIf="posts$[i].dimension[s].weight>0">{{posts$[i].dimension[s].weight}}</span></h2>
-					<div *ngIf="posts$[i].dimension[s].weight>0">
+				<li *ngFor="let dimension of posts$[i].Dimensions; let s=index">
+					<h2><font color="#579C87">{{dimension.Label}}</font><mat-slider class="slider" min="0" [max]="category.weight" step="0.05" thumbLabel tickInterval="auto" [(ngModel)]="posts$[i].Dimensions[s].weight"></mat-slider>
+						<span *ngIf="posts$[i].Dimensions[s].weight>0">{{posts$[i].Dimensions[s].weight}}</span></h2>
+					<div *ngIf="posts$[i].Dimensions[s].weight>0">
 						<ul>
 							<div *ngIf="rankingType==='Metrics'">
-							<li *ngFor="let metric of ((posts$[i].dimension)[s]).metric; let m=index">
-								<tr ><font color="#A1C181">{{metric.label}}<mat-slider class="slider" thumbLabel tickInterval="auto" min="0" [max]="dimension.weight" step="0.05"  [(ngModel)]="posts$[i].dimension[s].metric[m].weight" style="float: right;"></mat-slider></font>
-									<div *ngIf="posts$[i].dimension[s].metric[m].weight>0">{{posts$[i].dimension[s].metric[m].weight}}</div></tr>
+							<li *ngFor="let metric of ((posts$[i].Dimensions)[s]).Metrics; let m=index">
+								<tr ><font color="#A1C181">{{metric.Label}}<mat-slider class="slider" thumbLabel tickInterval="auto" min="0" [max]="dimension.weight" step="0.05"  [(ngModel)]="posts$[i].Dimensions[s].Metrics[m].weight" style="float: right;"></mat-slider></font>
+									<div *ngIf="posts$[i].Dimensions[s].Metrics[m].weight>0">{{posts$[i].Dimensions[s].Metrics[m].weight}}</div></tr>
 							</li>
 						</div>
 						</ul>

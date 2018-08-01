@@ -10,9 +10,9 @@ import {map, startWith} from 'rxjs/operators';
 // }
 
 interface State {
-  "Dataset-PLD":string,
-  "Graph-URI":string,
-  "Rank-Value":number
+  'Dataset-PLD':string,
+  'Graph-URI':string,
+  'Rank-Value':number
 }
 
 @Component({
@@ -25,7 +25,7 @@ export class UsersComponent implements OnInit {
 
   showSpinner = true
 	users$:State[]
-  states: State[] = [];
+  states:State[]
   label = 'Label';
   stateCtrl: FormControl;
   filteredStates: Observable<any[]>;
@@ -40,10 +40,13 @@ export class UsersComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.data.currentRankedUsers.subscribe(res => this.users$ = res)
+    this.data.currentRankedUsers.subscribe((res) => {
+      console.log(res)
+      this.users$ = res
+      this.states = res
+    })
     this.data.CurrentSpinner.subscribe(res => this.showSpinner = res)
     
-    console.log(this.users$)
   }
 
   setLabel(label){
@@ -52,7 +55,7 @@ export class UsersComponent implements OnInit {
 
   filterStates(name: string) {
     return this.states.filter(state =>
-      state[ "Dataset-PLD"].toLowerCase().indexOf(name.toLowerCase()) === 0);
+      state['Dataset-PLD'].toLowerCase().indexOf(name.toLowerCase()) === 0);
   }
 
 }

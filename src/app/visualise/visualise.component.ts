@@ -44,13 +44,13 @@ export class VisualiseComponent implements OnInit {
         this.data.getFacets()
     .subscribe(
       data => {
-        let posts$ = (data.category)
+        let posts$ = (data.Categories)
         console.log(posts$)
 
         for(let c in posts$){
-          for(let d in posts$[c]['dimension']){
-            for(let m in posts$[c]['dimension'][d].metric){
-              this.metricURIs.push((posts$[c]['dimension'][d].metric[m]))       
+          for(let d in posts$[c]['Dimensions']){
+            for(let m in posts$[c]['Dimensions'][d].Metrics){
+              this.metricURIs.push((posts$[c]['Dimensions'][d].Metrics[m]))       
             }
           }
         }
@@ -138,12 +138,12 @@ export class VisualiseComponent implements OnInit {
           for(let dr in this.metricsForm.value){
             found=0
             r=0
-            while (found==0 && r<res.metrics.length){
+            while (found==0 && r<res.Metrics.length){
                //console.log(`Comparing ${res.metrics[r].name} and ${this.metricsForm.value[dr].label}`)
                //console.log(r)
-               if(res.metrics[r].name===this.metricsForm.value[dr].label && res.metrics[r].latestValue>=0){
+               if(res.Metrics[r]['Metric-Label']===this.metricsForm.value[dr].Label && res.Metrics[r]['Observations'][0].Value>=0){
                  //console.log(`${res.metrics[r].name} ${res.metrics[r].latestValue}`)
-                 testdata.push(res.metrics[r].latestValue)
+                 testdata.push(res.Metrics[r]['Observations'][0].Value)
                  found = 1
                }
                r++
@@ -177,7 +177,7 @@ export class VisualiseComponent implements OnInit {
           this.rdatasets.push(tmp) 
           //console.log(`Final ${this.rdatasets.map(res=>{res.data; res.label})} `)
           this.rdatasets.map(res=>{console.log(res)})
-          let rlabel = this.metricsForm.value.map(res=>res.label)
+          let rlabel = this.metricsForm.value.map(res=>res.Label)
           let rdatasets1 = this.rdatasets
           let rlabel2 = rlabel
           let rdatasets2 = rdatasets1

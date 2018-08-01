@@ -3,72 +3,116 @@
 	<li><h2>{{label}}</h2></li>
 	<li>
 		<h3>Details</h3>
-		<div><h4>Number of tuples</h4>24003428924</div>
-		<div><h4>Assessment Logs</h4>24th January 2017<br>3rd March 2017</div>
+		<div><h4>Number of tuples</h4>24038924</div>
+		<h4>Assessment Logs</h4>
+		<div *ngFor="let date of AssessDates['Assessment-Dates']">
+			{{date}}
+		</div>
 	</li>
+</ul>	
+<ul>					
 	<li>
-		<h3>Radar Chart</h3>
-		<div *ngIf="radarChart">
-			<canvas id="radar1">{{radarChart}}</canvas>
-		</div>
+		<mat-slide-toggle class="example-margin" [(ngModel)]="filterMetrics">
+			Filter
+		</mat-slide-toggle>
 	</li>
-	<li>
-		<h3>Bar Chart</h3>
-		<div *ngIf="barChart">
-			<canvas id="bar1">{{barChart}}</canvas>
-		</div>
-	</li>
-</ul>
+	<div *ngIf="filterMetrics">
+	  <mat-expansion-panel>
 
+	    <mat-expansion-panel-header>
+	      <mat-panel-title>
+	      	Metric Filter
+	      </mat-panel-title>
+	      <mat-panel-description>
+	        Select What type of Metrics you wish to view
+	      </mat-panel-description>
+	    </mat-expansion-panel-header>
 
-<ul>
-	
-</ul>
+		<mat-form-field>
+		  <mat-select placeholder="Categories" [formControl]="CategoriesF" multiple>
+		    <mat-option *ngFor="let cat of CatList" [value]="cat">{{cat}}</mat-option>
+		  </mat-select>
+		</mat-form-field>
+		<br>
+		<mat-form-field>
+		  <mat-select placeholder="Dimensions" [formControl]="DimensionsF" multiple>
+		    <mat-option *ngFor="let dim of DimList" [value]="dim">{{dim}}</mat-option>
+		  </mat-select>
+		</mat-form-field>
 
+		<mat-form-field class="example-full-width">
+	    	 <input matInput placeholder="Min Value" [formControl]="minForm">
+	  	</mat-form-field>
+	  	<mat-form-field class="example-full-width">
+	    	 <input matInput placeholder="Max Value" [formControl]="maxForm">
+	  	</mat-form-field>
+	  	 <mat-error *ngIf="(maxForm.value-minForm.value)<0">
+	      Minimum can not be greater than Maximum
+	      Min: {{minForm.value}} Max: {{maxForm.value}} {{maxForm.value-minForm.value}}
+	    </mat-error>
+	    <mat-error *ngIf="!(minForm.value>=0 && maxForm.value<=100)">
+	      Please enter value between 0 and 100
+	    </mat-error>
+	     <mat-error *ngIf="minForm.hasError('required')">
+	      Min and Max Values are <strong>required</strong>
+	    </mat-error>
+	    <div (click)="filter()"><i class="material-icons">filter_list</i>	<button mat-button [disabled]="(maxForm.value-minForm.value)<0 || minForm.hasError('required')">Filter</button></div>
 
-<ul>
-	<li>
-		<h3>Visualisation of Metric Over Time</h3>
-		<div>
-			<form class="example-form">
-	  			<mat-form-field class="example-full-width">
-	    			<input type="text" placeholder="Choose a metric" aria-label="Number" matInput [formControl]="myControl" [matAutocomplete]="auto">
-	    				<mat-autocomplete #auto="matAutocomplete">
-	      					<mat-option (click)=metricVis(option) *ngFor="let option of metricURIs" [value]="option">
-	        					{{ option.slice(30) }}
-	      					</mat-option>
-	   					 </mat-autocomplete>
-	  			</mat-form-field>
-			</form>
-		</div>
-		<ul>
-			<li>
-				<div *ngIf="chart">
-					<canvas id="canvas">{{chart}}</canvas>
-				</div>
-			</li>
-		</ul>
-	</li>
-</ul>
-
-
-<ul>
-	<ul><li (click)="showMetrics=!showMetrics"><h3 position="relative">Metrics<i class="material-icons">arrow_drop_down</i></h3></li>
-		<li (click)="openDialog()"> <i class="material-icons">settings</i><button mat-button>Configure Metric Thresholds</button></li>
-	</ul>
-	<div *ngIf="showMetrics">
-		<li>Current Value <br> <font color="#A1C181">Threshold Value</font><br> <font color="#8B008B">LOD Data Avg.</font></li>
-		<div  *ngFor="let metric of quality_metrics; let i=index" (click)="quality_metrics[i].show=!quality_metrics[i].show"><li>{{metric.name}}
-			<h5>{{metric.latestValue}}    <font color="#A1C181">{{metric.weight}}</font></h5>
-			<mat-progress-bar mode="determinate" [value]="(quality_metrics[i].latestValue/quality_metrics[i].weight)*100"></mat-progress-bar>
-			
-			<div *ngIf="quality_metrics[i].show">
-				<ul>
-				<h4>Comment</h4>
-			"Provides a measure of the redundancy of the dataset at the data level, computed as the ratio of the Number of Unique Subjects to the Total Number of Subjects"
-			</ul>
-			</div>
-		</li>
-		</div>
+	  </mat-expansion-panel>
 	</div>
 </ul>
+
+<mat-tab-group>
+  <mat-tab label="Profile Dashboard"> 
+	<ul>
+		<li>
+			<h3>Radar Chart</h3>
+			<div *ngIf="radarChart">
+				<canvas id="radar1">{{radarChart}}</canvas>
+			</div>
+		</li>
+		<li>
+			<h3>Bar Chart</h3>
+			<div *ngIf="barChart">
+				<canvas id="bar1">{{barChart}}</canvas>
+			</div>
+		</li>
+	</ul>
+  </mat-tab>
+
+  <mat-tab label="Metrics"> 
+  	<ng-template matTabContent>
+  	<div class="Container">
+        <div class="Left">
+        	<ul>		
+				<li (click)="openDialog()"><i class="material-icons">settings_applications</i>	<button mat-button>Configure Metric Thresholds</button></li>
+				<li>Current Value <br> <font color="#A1C181">Threshold Value</font><br> <font color="#8B008B">LOD Data Avg.</font></li>
+				<div *ngIf="!filterMetrics">
+					<div  *ngFor="let metric of quality_metrics; let i=index" (click)="quality_metrics[i].show=!quality_metrics[i].show">
+						<li (click)="newMetricProfile(metric)">{{metric['Metric-Label']}}
+							<h5>{{metric['Observations'][0].Value}}    <font color="#A1C181">{{metric.weight}}</font></h5>
+							<mat-progress-bar mode="determinate" [value]="(quality_metrics[i]['Observations'][0].Value/quality_metrics[i].weight)*100"></mat-progress-bar>
+
+						</li>
+					</div>
+				</div>
+
+				<div *ngIf="filterMetrics">
+					<div  *ngFor="let Fmetric of Filteredmetrics; let s=index">
+						<li (click)="newMetricProfile(Fmetric)">{{Fmetric['Metric-Label']}}
+							<h5>{{Fmetric['Observations'][0].Value}}    <font color="#A1C181">{{Fmetric.weight}}</font></h5>
+							<mat-progress-bar mode="determinate" [value]="(Fmetric['Observations'][0].Value/Fmetric.weight)*100"></mat-progress-bar>
+
+						</li>
+					</div>
+				</div>
+
+			</ul>
+		</div>
+        <div class="Middle" *ngIf="showProfilePage">
+        	<app-metric-profile></app-metric-profile> 
+        </div>
+    </div>
+	</ng-template>
+  </mat-tab>
+</mat-tab-group>

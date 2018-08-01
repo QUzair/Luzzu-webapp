@@ -24,12 +24,12 @@
 			<li>
 				<mat-form-field class="example-full-width">
 			  		<mat-select placeholder="Metrics" [(formControl)]="metricsForm" multiple>
-			    		<mat-option *ngFor="let metric of metricURIs" [value]="metric">{{metric.label}}</mat-option>
+			    		<mat-option *ngFor="let metric of metricURIs" [value]="metric">{{metric.Label}}</mat-option>
 			  		</mat-select>
 				</mat-form-field>
 				<ul *ngFor="let m of metricsForm.value">
 					<li>
-						{{m.label}}
+						{{m.Label}}
 					</li>
 				</ul>
 			</li>

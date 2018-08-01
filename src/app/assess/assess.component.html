@@ -43,11 +43,11 @@
 						  		</mat-select>
 							</mat-form-field>
 							<div *ngFor="let m of metricsForm.value; let i=index">
-									<h4>{{m.label}}</h4>
-									- {{sampleText[i]}}
+									<h4>{{m.label}}</h4><p>{{m.comment}}</p>
 							</div>
 						</li>
 				</div>
 	</div>
 </ul>
+
 
