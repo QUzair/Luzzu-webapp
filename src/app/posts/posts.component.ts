@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 export interface RankOption{
   RankName: string,
@@ -51,7 +52,7 @@ export class PostsComponent implements OnInit {
  {
     RankName:"Testing",
     RankType:"Categories",
-    Description:"Currently being used to only test the two available datasets",
+    Description:"Currently being used to test the two available datasets",
     Weights:[
     {Label:"Contextual",Value:1},
     {Label:"Representational",Value:0},
@@ -80,7 +81,7 @@ export class PostsComponent implements OnInit {
    {
     RankName:"Metrics Ranking Option",
     RankType:"Metrics",
-    Description:"Standard Metrics Ranking based on No Blank Node, Undefined Classes and Basic Provenance Metric",
+    Description:"Metrics Ranking based on No Blank Node, Undefined Classes and Basic Provenance Metric",
     Weights:[
     {Label:"No blank node metric",Value:0.25},
     {Label:"Undefined classes and properties metric",Value:0.25},

@@ -11,6 +11,8 @@ import {FormControl} from '@angular/forms';
 export class SidebarComponent implements OnInit {
 
 	currentUrl:string
+	Assessment = false
+	Assessment_Stats=true
 
   constructor(private router: Router) {
 
@@ -18,6 +20,8 @@ export class SidebarComponent implements OnInit {
    }
 
   ngOnInit() {
+  	//Get Config File
+
   }
 
 }

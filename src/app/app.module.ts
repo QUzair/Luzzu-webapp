@@ -11,6 +11,7 @@ import { DetailsComponent } from './details/details.component';
 import { HttpClientModule }  from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { StorageServiceModule } from 'angular-webstorage-service';
 
 import { MaterialModule } from './material.module';
 import { LayoutModule } from '@angular/cdk/layout';
@@ -55,7 +56,8 @@ import { MetricProfileComponent } from './metric-profile/metric-profile.componen
     ReactiveFormsModule,
     MatTooltipModule,
     MatCheckboxModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    StorageServiceModule
   ],
   entryComponents: [
         MetricDialogComponent

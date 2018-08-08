@@ -30,15 +30,20 @@
 
 		<mat-form-field>
 		  <mat-select placeholder="Categories" [formControl]="CategoriesF" multiple>
-		    <mat-option *ngFor="let cat of CatList" [value]="cat">{{cat}}</mat-option>
+		    <mat-option (click)="showDimen=true" *ngFor="let cat of CatList" [value]="cat">{{cat}}</mat-option>
 		  </mat-select>
 		</mat-form-field>
 		<br>
-		<mat-form-field>
-		  <mat-select placeholder="Dimensions" [formControl]="DimensionsF" multiple>
-		    <mat-option *ngFor="let dim of DimList" [value]="dim">{{dim}}</mat-option>
-		  </mat-select>
-		</mat-form-field>
+			<mat-form-field>
+			  <mat-select placeholder="Dimensions" [formControl]="DimensionsF" multiple>
+			    <mat-option>-- None --</mat-option>
+			    <mat-optgroup *ngFor="let group of posts$" [label]="group.Label">
+			      <mat-option *ngFor="let dimen of group.Dimensions" [value]="dimen.Label">
+			        {{dimen.Label}}
+			      </mat-option>
+			    </mat-optgroup>
+			  </mat-select>
+			</mat-form-field>
 
 		<mat-form-field class="example-full-width">
 	    	 <input matInput placeholder="Min Value" [formControl]="minForm">
@@ -89,11 +94,12 @@
 				<li>Current Value <br> <font color="#A1C181">Threshold Value</font><br> <font color="#8B008B">LOD Data Avg.</font></li>
 				<div *ngIf="!filterMetrics">
 					<div  *ngFor="let metric of quality_metrics; let i=index" (click)="quality_metrics[i].show=!quality_metrics[i].show">
+						<div id="mydiv" style="background:white" onmouseover="this.style.background='gray';" onmouseout="this.style.background='white';">
 						<li (click)="newMetricProfile(metric)">{{metric['Metric-Label']}}
 							<h5>{{metric['Observations'][0].Value}}    <font color="#A1C181">{{metric.weight}}</font></h5>
 							<mat-progress-bar mode="determinate" [value]="(quality_metrics[i]['Observations'][0].Value/quality_metrics[i].weight)*100"></mat-progress-bar>
-
 						</li>
+						</div>
 					</div>
 				</div>
 

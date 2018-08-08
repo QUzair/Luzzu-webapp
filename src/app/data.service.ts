@@ -276,5 +276,19 @@ export class DataService {
   );
   }
 
+    MetricsForDated(pld,date): Observable<any> {
+  const body = new HttpParams()
+    .set('Dataset-PLD', pld)
+    .set('Date',date);
+
+  return this.http.post('http://0.0.0.0:8080/Luzzu/v4/dataset/quality/',
+    body.toString(),
+    {
+      headers: new HttpHeaders()
+        .set('Content-Type', 'application/x-www-form-urlencoded')
+    }
+  );
+  }
+
   }
 

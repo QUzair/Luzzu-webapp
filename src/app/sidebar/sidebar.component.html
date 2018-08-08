@@ -24,16 +24,20 @@
 				<i class="material-icons">signal_cellular_alt</i>
 			</a>
 		</li>
-		<li matTooltip="Assessment">
-			<a routerLink="assess" [class.activated]="currentUrl=='/assess'">
-				<i class="material-icons">create</i>
-			</a>
-		</li>
-		<li matTooltip="Assessment Stats">
-			<a routerLink="assessmentstats" [class.activated]="currentUrl=='/assessmentstats'">
-				<i class="material-icons">done_outline</i>
-			</a>
-		</li>
+		<div *ngIf="Assessment">
+			<li matTooltip="Assessment">
+				<a routerLink="assess" [class.activated]="currentUrl=='/assess'">
+					<i class="material-icons">create</i>
+				</a>
+			</li>
+		</div>
+		<div *ngIf="Assessment_Stats">
+			<li matTooltip="Assessment Stats">
+				<a routerLink="assessmentstats" [class.activated]="currentUrl=='/assessmentstats'">
+					<i class="material-icons">done_outline</i>
+				</a>
+			</li>
+		</div>
 
 	</ul>
 

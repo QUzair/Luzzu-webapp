@@ -397,7 +397,6 @@ export class DetailsComponent implements OnInit {
     this.Filteredmetrics = arr
     console.log(this.Filteredmetrics)
   }
-
 }
 
 

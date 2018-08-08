@@ -4,21 +4,46 @@
  		<h2>{{metric['Metric-Label']}}</h2>
  		<p><strong><font color="#233D4D">Category</font></strong> : {{metric['Category']}}</p>
  		<p><strong><font color="#579C87">Dimension</font></strong> : {{metric['Dimension']}}</p>
- 		<p><strong>Type :</strong>{{metric['Observations'][0]['Value-Type']}}</p>
- 		<p><strong>Date Computed :</strong>{{metric['Observations'][0]['Date-Computed']}}</p>
- 		<p><strong>Graph-URI :</strong>{{metric['Observations'][0]['Graph-URI']}}</p>
- 		<p><strong>Comment :</strong><br>Detects the redefinition by third parties of external classes/properties such that reasoning over data using those external terms is affected</p>
+ 		<p><strong>Type :</strong> {{metric['Observations'][0]['Value-Type']}}</p>
+ 		<p><strong>Date Computed :</strong> {{metric['Observations'][0]['Date-Computed']}}</p>
+ 		<p><strong>Graph-URI :</strong> {{metric['Observations'][0]['Graph-URI']}}</p>
+ 		<p><strong>Comment :</strong><br> {{comment}}</p>
+
+ 		<div *ngIf="ETU">
+	 		<p><strong>Estimation-Technique-Used : </strong>
+	 			<a href="{{profileProperties['Estimation-Technique-Used']}}" disabled="!(profileProperties['Estimation-Technique-Used-ValueType']=='URI')" target="_blank">{{profileProperties['Estimation-Technique-Used']}}</a>
+	 		</p>
+	 	</div>
+	 	<div *ngIf="EP">
+	 		<table>
+				<tr>
+				    <th>Key</th>
+				    <th>Value</th>
+				</tr>
+				 <tr>
+	 				<div *ngFor="let par of profileProperties['Estimation-Parameter']">		
+						    <td>{{par.Key}}</td>
+						    <td>{{par.Value}}</td>
+					</div>
+				</tr>
+	 		</table>
+ 		</div>
 	</li>
 	<li>
 		<ul>
 			<li>
-				<h4>Quality</h4>
-				<div class="chart-container">
-					<div *ngIf="donut" class = "Quality">
-					    <canvas id="donut1">{{ donut }}</canvas>
-					</div>
+				<div class="row">
+				  <div class="column" *ngIf="barChart">
+				  	<h4>Triples Assessed</h4>
+				  	<canvas id="bar">{{barChart}}</canvas>
+				  </div>
+				  <div class="column" *ngIf="donut">
+				  	<h4>Quality</h4>
+				  	<canvas id="donut1">{{ donut }}</canvas>
+				  </div>
 				</div>
 			</li>
+
 			<li>
 				<h4>Progress Over Time</h4>
 				<div *ngIf="chart">
