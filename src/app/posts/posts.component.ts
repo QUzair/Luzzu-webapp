@@ -21,6 +21,7 @@ export interface RankOption{
   Weights: any[]
 }
 
+
 @Component({
   selector: 'app-posts',
   templateUrl: './posts.component.html',
@@ -32,18 +33,23 @@ export class PostsComponent implements OnInit {
   rankCtrl = new FormControl()
   filteredOptions: Observable<RankOption[]>;
 
-  DisplayRank:RankOption
+  
+  showSaveRanking = true
   showRankOption = false
-  rank=false
-	posts$:Object
-	request = []
-  dat = {type:"",uri:"",weight:0};
-  weight=0;
-  res:Object 
-  metricURIs= []
-  rankingType: string;
-  ranks: string[] = ['Categories', 'Dimensions', 'Metrics'];
   showSpinner = true;
+  rank=false
+
+	posts$:Object
+  DisplayRank:RankOption
+
+	request = []
+  Configs = []
+  metricURIs= []
+  ranks: string[] = ['Categories', 'Dimensions', 'Metrics'];
+
+  rankingType: string;
+  dat = {type:"",uri:"",weight:0};
+  
 
   NameForm= new FormControl()
   DescriptionForm = new FormControl()
@@ -57,7 +63,6 @@ export class PostsComponent implements OnInit {
     {Label:"Contextual",Value:1},
     {Label:"Representational",Value:0},
     {Label:"Intrinsic",Value:0}]
-
   },
    {
     RankName:"Kitgo Datasets",
@@ -89,18 +94,24 @@ export class PostsComponent implements OnInit {
     ]
   }
   ]
+
   constructor(private data: DataService) { 
           this.filteredOptions = this.rankCtrl.valueChanges
       .pipe(
         startWith(''),
-        map(state => state ? this._filterOptions(state) : this.rankingOptions.slice())
+        map(res => res ? this._filterOptions(res) : this.rankingOptions.slice())
       );
     }
 
   ngOnInit() {
+    this.data.getConfigurations().subscribe((res)=>{
+      this.Configs = res
+      let p = this.Configs.filter(res=>res.Name=="Posts")
+      let sr = p[0].Elements.filter(res=>res.Name=="Save_Ranking")
+      this.showSaveRanking = !sr[0].Disable
+    })
   	this.loadfacets()
   }
-
 
 
   loadfacets(){
@@ -241,7 +252,7 @@ AssembleR(){
 
   private _filterOptions(value: string): RankOption[] {
     let filterValue = value.toLowerCase();
-    return this.rankingOptions.filter(state => state.RankName.toLowerCase().indexOf(filterValue) === 0);
+    return this.rankingOptions.filter(res => res.RankName.toLowerCase().indexOf(filterValue) === 0);
   }
 
   SavingRanking(){

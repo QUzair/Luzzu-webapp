@@ -19,6 +19,7 @@ import { MetricProfileComponent } from '../metric-profile/metric-profile.compone
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 
 @Component({
@@ -30,7 +31,6 @@ export class DetailsComponent implements OnInit {
 
 
   Dimen: string[] = ['Categories', 'Dimensions', 'Metrics'];
-  //myControl: FormControl = new FormControl();
 
   CategoriesF = new FormControl();
   DimensionsF = new FormControl();
@@ -106,18 +106,13 @@ export class DetailsComponent implements OnInit {
     this.loadMetrics()
   }
 
-  metricVis(option){
-    let arr = [option]
-    console.log(arr)
-    this.loadVis(this.label,arr)
-  }
 
   loadMetrics(){
-        this.vdata.vsQuality(this.label).subscribe(
+    this.vdata.vsQuality(this.label).subscribe(
       (data)=>{
         console.log(data)
         this.quality_metrics = data.Metrics
-
+        
         for(let i in this.quality_metrics){
           console.log(this.quality_metrics[i].Observations[0]['Value-Type'])
           if(this.quality_metrics[i].Observations[0]['Value-Type']==="Double")
@@ -155,13 +150,6 @@ export class DetailsComponent implements OnInit {
           return 0 //default return value (no sorting)
         })
 
-        for(let l in this.quality_metrics){
-              Object.defineProperty(this.quality_metrics[l],'show',{
-              value: false,
-              writable:true,
-              configurable:true
-            });
-        }
         
       this.data.getLODdata().subscribe((res)=>{
         this.lodDataService = res
@@ -170,7 +158,6 @@ export class DetailsComponent implements OnInit {
         let loddata_temp = []
         for(let f in this.quality_metrics){
               for(let s in this.lodDataService){
-                //console.log(`${this.quality_metrics[f].name} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
                 if(this.quality_metrics[f]['Metric-Label']===this.lodDataService[s].name){
                   console.log(`${this.quality_metrics[f]['Metric-Label']} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
                   loddata_temp.push(this.lodDataService[s].mean)
@@ -182,84 +169,8 @@ export class DetailsComponent implements OnInit {
             console.log(loddata_temp)
             this.loadRadar(this.rlabels1,this.rdata1,this.lodData)
             this.loadBar(this.rlabels1,this.rdata1,this.lodData)
+      })
     })
-      } 
-    )
-  }
-
-  loadVis(label,metrics){
-        this.vdata.vstime(label,metrics)
-      .subscribe(
-        (res)=> {
-          console.log(res)
-          console.log(res.metrics[0].lstObservations[0].observationDate)
-          console.log(res.metrics[0].lstObservations[0].observationValue)
-
-          let obsDate = []
-          let obsValue = []
-          let name = []
-          for(let i in res.metrics){
-            name.push(res.Metrics[i]['Metric-Label'])
-            for(let c in res.Metrics[i].lstObservations){
-              obsDate.push(res.Metrics[i].lstObservations[c].observationDate)
-              obsValue.push(res.Metrics[i].lstObservations[c].observationValue)
-            }
-          }
-
-          console.log(` obsDate: ${obsDate}`)
-          console.log(`obsValue: ${obsValue}`)
-          console.log(` name: ${name}`)
-
-          let visDates = []
-
-          for(let c in obsDate){
-            var jsdate = new Date(obsDate[c])
-
-            console.log(jsdate)
-            visDates.push(jsdate.toLocaleTimeString('en-GB',{year:'numeric',month:'short',day:'numeric'}))
-          }
-
-          console.log(visDates)
-
-          this.chart = new Chart('canvas',{
-
-            type: 'line',
-            data: {
-              labels: visDates,
-              datasets: [
-                {
-                  label: name,
-                  data: obsValue,
-                  borderColor: '#3cba9f',
-                  fill: false
-                }
-              ]
-            },
-            options: {
-              scaleShowvalues:true,
-              legend: {
-                display: true
-              },
-              scales: {
-                xAxes: [{
-                  display:true,
-                  ticks:{
-                    autoSkip:false
-                  }
-                }],
-                yAxes: [{
-                  ticks:{
-                    beginAtZero:true
-                  },
-                  display:true
-                }]
-              }
-            }
-          })
-    
-        }
-      )
-
   }
 
   loadRadar(rlabels,rdata,loddata){
@@ -271,7 +182,7 @@ export class DetailsComponent implements OnInit {
                       "labels":rlabels,
                       "datasets":[
                         {
-                          "label":this.label.slice(7),"data":rdata,
+                          "label":this.label,"data":rdata,
                           "fill":true,"backgroundColor":"rgba(255, 99, 132, 0.2)",
                           "borderColor":"rgb(255, 99, 132)",
                           "pointBackgroundColor":"rgb(255, 99, 132)",
@@ -279,7 +190,6 @@ export class DetailsComponent implements OnInit {
                           "pointHoverBackgroundColor":"#fff",
                           "pointHoverBorderColor":"rgb(255, 99, 132)"
                         },
-
                         {
                           "label":"LOD Average Data",
                           "data":loddata,
@@ -316,7 +226,7 @@ export class DetailsComponent implements OnInit {
                       "labels":rlabels,
                       "datasets":[
                         {
-                          "label":this.label.slice(7),"data":rdata,
+                          "label":this.label,"data":rdata,
                           "fill":true,"backgroundColor":"rgba(255, 99, 132, 0.2)",
                           "borderColor":"rgb(255, 99, 132)",
                           "pointBackgroundColor":"rgb(255, 99, 132)",
@@ -346,6 +256,13 @@ export class DetailsComponent implements OnInit {
                               "tension":0,
                                "borderWidth":3
                             }
+                        },
+                        "scales": {
+                          "xAxes":[{
+                            "ticks": {
+                              "autoSkip":false
+                            }
+                          }]
                         }
                     }
               })
@@ -396,6 +313,152 @@ export class DetailsComponent implements OnInit {
     }
     this.Filteredmetrics = arr
     console.log(this.Filteredmetrics)
+  }
+
+
+  newDate(date){
+    console.log(date)
+
+      this.data.MetricsForDated(this.label,date).subscribe(
+      (data)=>{
+        console.log(data)
+        this.quality_metrics = data.Metrics
+        
+        for(let i in this.quality_metrics){
+          console.log(this.quality_metrics[i].Observations[0]['Value-Type'])
+          if(this.quality_metrics[i].Observations[0]['Value-Type']==="Double")
+            this.quality_metrics[i].Observations[0]['Value']=this.quality_metrics[i].Observations[0]['Value']*100
+
+          Object.defineProperty(this.quality_metrics[i],'weight',{
+              value: 100,
+              writable:true,
+              configurable:true
+            });
+        }
+        console.log(this.quality_metrics)
+
+        this.rlabels1 = this.quality_metrics.map((res)=>{
+          return res['Metric-Label']
+        })
+        this.rdata1 = this.quality_metrics.map((res)=>{
+          console.log((res['Observations'][0]).Value)
+          if((res['Observations'][0]).Value<=100) return (res['Observations'][0]).Value
+          else return 50
+        })
+
+        this.labelMetrics = this.rdata1
+        console.log(`rlabels: ${this.rlabels1.length} ${this.rlabels1}`)
+        console.log(`rdata: ${this.rdata1}`)
+        
+
+
+        this.quality_metrics.sort(function(a, b){
+          var nameA=(a['Observations'][0]).Value, nameB=(b['Observations'][0]).Value
+          if (nameA < nameB) //sort string ascending
+            return -1 
+          if (nameA > nameB)
+            return 1
+          return 0 //default return value (no sorting)
+        })
+
+        
+      this.data.getLODdata().subscribe((res)=>{
+        this.lodDataService = res
+        console.log(this.lodDataService)
+        console.log(this.quality_metrics)
+        let loddata_temp = []
+        for(let f in this.quality_metrics){
+              for(let s in this.lodDataService){
+                if(this.quality_metrics[f]['Metric-Label']===this.lodDataService[s].name){
+                  console.log(`${this.quality_metrics[f]['Metric-Label']} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
+                  loddata_temp.push(this.lodDataService[s].mean)
+                }
+              }
+            }
+            this.lodData=loddata_temp
+            console.log(this.lodData)
+            console.log(loddata_temp)
+            this.addData(this.radarChart,this.rlabels1,this.rdata1,this.lodData)
+            this.addData(this.barChart,this.rlabels1,this.rdata1,this.lodData)
+      })
+    })
+  }
+
+  DisplayLatest(){
+        this.vdata.vsQuality(this.label).subscribe(
+      (data)=>{
+        console.log(data)
+        this.quality_metrics = data.Metrics
+        
+        for(let i in this.quality_metrics){
+          console.log(this.quality_metrics[i].Observations[0]['Value-Type'])
+          if(this.quality_metrics[i].Observations[0]['Value-Type']==="Double")
+            this.quality_metrics[i].Observations[0]['Value']=this.quality_metrics[i].Observations[0]['Value']*100
+
+          Object.defineProperty(this.quality_metrics[i],'weight',{
+              value: 100,
+              writable:true,
+              configurable:true
+            });
+        }
+        console.log(this.quality_metrics)
+
+        this.rlabels1 = this.quality_metrics.map((res)=>{
+          return res['Metric-Label']
+        })
+        this.rdata1 = this.quality_metrics.map((res)=>{
+          console.log((res['Observations'][0]).Value)
+          if((res['Observations'][0]).Value<=100) return (res['Observations'][0]).Value
+          else return 50
+        })
+
+        this.labelMetrics = this.rdata1
+        console.log(`rlabels: ${this.rlabels1.length} ${this.rlabels1}`)
+        console.log(`rdata: ${this.rdata1}`)
+        
+
+
+        this.quality_metrics.sort(function(a, b){
+          var nameA=(a['Observations'][0]).Value, nameB=(b['Observations'][0]).Value
+          if (nameA < nameB) //sort string ascending
+            return -1 
+          if (nameA > nameB)
+            return 1
+          return 0 //default return value (no sorting)
+        })
+
+        
+      this.data.getLODdata().subscribe((res)=>{
+        this.lodDataService = res
+        console.log(this.lodDataService)
+        console.log(this.quality_metrics)
+        let loddata_temp = []
+        for(let f in this.quality_metrics){
+              for(let s in this.lodDataService){
+                if(this.quality_metrics[f]['Metric-Label']===this.lodDataService[s].name){
+                  console.log(`${this.quality_metrics[f]['Metric-Label']} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
+                  loddata_temp.push(this.lodDataService[s].mean)
+                }
+              }
+            }
+            this.lodData=loddata_temp
+            console.log(this.lodData)
+            console.log(loddata_temp)
+            this.addData(this.radarChart,this.rlabels1,this.rdata1,this.lodData)
+            this.addData(this.barChart,this.rlabels1,this.rdata1,this.lodData)
+      })
+    })
+  }
+
+   addData(chart, labels, data,LOD_Data) {
+     try{
+      chart.data.labels=labels;
+      chart.data.datasets[0].data=data
+      chart.data.datasets[1].data=LOD_Data
+      chart.update();
+    }catch(err){
+      console.log(err)
+    }
   }
 }
 

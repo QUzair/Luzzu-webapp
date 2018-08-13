@@ -7,7 +7,6 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormControl } from '@angular/forms';
 import { DataService } from '../data.service';
 
-var counter = 0
 
 @Component({
   selector: 'app-visualise',
@@ -17,16 +16,17 @@ var counter = 0
 
 export class VisualiseComponent implements OnInit {
 
+  counter = 0
 	response:Object
   radarChartm = []
   barChartm = []
 	chart = [];
-  users$ = [] //Contains the Options for the datasets
-  rlabels = [] //Stores all metrics to be used
-  rdatasets = [] //Stores data for the radar chart
-  datasetsForm = new FormControl(); //Contains the desired metrics
-  metricsForm = new FormControl(); // Contains the desired datasets
-  metricURIs = [] //Contains the Options for metrics form
+  users$ = []                           //Contains the Options for the datasets
+  rlabels = []                          //Stores all metrics to be used
+  rdatasets = []                        //Stores data for the radar chart
+  datasetsForm = new FormControl();     //Contains the desired metrics
+  metricsForm = new FormControl();      // Contains the desired datasets
+  metricURIs = []                       //Contains the Options for metrics form
 
   
   constructor(private _vdata: VDataService, private data: DataService) { }
@@ -89,9 +89,6 @@ export class VisualiseComponent implements OnInit {
 
   loadBar(rlabels,rdata){
       console.log('Loading Bar chart...')
-      //console.log(rlabels)
-      //console.log(rdata)
-      //this.radarChartm.update()
               this.barChartm = new Chart('bar1',
                 {
                   "type":"bar",
@@ -109,7 +106,14 @@ export class VisualiseComponent implements OnInit {
                               "tension":10,
                                "borderWidth":3
                             }
-                        }
+                        },
+                      "scales": {
+                        "xAxes":[{
+                          "ticks": {
+                            "autoSkip":false
+                          }
+                        }]
+                      }
                     }
               })
 
@@ -120,8 +124,9 @@ export class VisualiseComponent implements OnInit {
     console.log("Starting Vis...")
     let found= 0
 
-    this.rdatasets = []
+    this.rdatasets = [] //Empty dataset Array
 
+    // Go through every Dataset selected in FormControl
     for (let d in this.datasetsForm.value){
       let testdata  = []
       console.log(this.datasetsForm.value[d]['Dataset-PLD'])
@@ -130,39 +135,31 @@ export class VisualiseComponent implements OnInit {
 
       this._vdata.vsQuality(this.datasetsForm.value[d]['Dataset-PLD']).subscribe(
         (res)=>{
-          //console.log(res)
-          //console.log(this.metricsForm.value)
-          //console.log(res.metrics.length)
 
           let r = 0 
           for(let dr in this.metricsForm.value){
             found=0
             r=0
             while (found==0 && r<res.Metrics.length){
-               //console.log(`Comparing ${res.metrics[r].name} and ${this.metricsForm.value[dr].label}`)
-               //console.log(r)
                if(res.Metrics[r]['Metric-Label']===this.metricsForm.value[dr].Label && res.Metrics[r]['Observations'][0].Value>=0){
-                 //console.log(`${res.metrics[r].name} ${res.metrics[r].latestValue}`)
-                 testdata.push(res.Metrics[r]['Observations'][0].Value)
+                 testdata.push((res.Metrics[r]['Observations'][0]['Value-Type']==='Double') ? res.Metrics[r]['Observations'][0]['Value']*100:res.Metrics[r]['Observations'][0]['Value'])
                  found = 1
                }
                r++
-               //console.log(r)
             }
             if(found==0){
-             //console.log(`Not found ${this.metricsForm.value[dr].label} `);
              testdata.push(0)
            }
             
           }
-           //Have array of data and label of datasetß
+           //Have array of data and label of datasets
           console.log(`${this.datasetsForm.value[d]['Dataset-PLD']} ${testdata}`)  
           let red = Math.floor(Math.random()*(255))
           let blue = Math.floor(Math.random()*(255))
           let green = Math.floor(Math.random()*(255))
-          //console.log(red+" "+blue+" "+green)
+
           var tmp = {
-            label:"hu", 
+            label:"Example", 
             data: [],
             "fill":true,
             "backgroundColor":`rgba(${red}, ${green}, ${blue}, 0.2)`,
@@ -175,22 +172,19 @@ export class VisualiseComponent implements OnInit {
           tmp.label= this.datasetsForm.value[d]['Dataset-PLD']
           tmp.data = testdata
           this.rdatasets.push(tmp) 
-          //console.log(`Final ${this.rdatasets.map(res=>{res.data; res.label})} `)
           this.rdatasets.map(res=>{console.log(res)})
           let rlabel = this.metricsForm.value.map(res=>res.Label)
           let rdatasets1 = this.rdatasets
-          let rlabel2 = rlabel
-          let rdatasets2 = rdatasets1
 
-          if(counter==0){
+          if(this.counter==0){
           this.loadRadar(rlabel,rdatasets1)
           this.loadBar(rlabel,rdatasets1)
-          counter++
+          this.counter++
           }
           else{
             console.log('Updating...')
             this.addData(this.radarChartm,rlabel,rdatasets1)
-            this.addData(this.barChartm,rlabel,rdatasets2)
+            this.addData(this.barChartm,rlabel,rdatasets1)
           }
 
 

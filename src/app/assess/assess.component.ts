@@ -29,19 +29,14 @@ export class AssessComponent implements OnInit {
 	      "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.consistency.UsageOfDeprecatedClassesOrProperties"
     ]}
     
-	pld = ''
-	dslocation = ''
+	pld:string
+	dslocation:string
 	metricsForm = new FormControl(); // Contains the desired datasets
 	data = []
 	checked =false
 	sparQlendpoint=false
 	problemReport=false
-	sampleText = [
-  "This is the definition of the metric you will be assessing",
-  "Provides a measure of the redundancy of the dataset at the data level, computed as the ratio of the Number of Unique Subjects to the Total Number of Subjects",
-  "Assesses the percentage of entities having an rdfs:label or rdfs:comment" 
 
-  ]
 
   constructor(private _vdata: VDataService, public snackBar: MatSnackBar) { }
 

@@ -26,6 +26,7 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { MetricDialogComponent } from './metric-dialog/metric-dialog.component';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import { MetricProfileComponent } from './metric-profile/metric-profile.component';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 
 
@@ -57,7 +58,8 @@ import { MetricProfileComponent } from './metric-profile/metric-profile.componen
     MatTooltipModule,
     MatCheckboxModule,
     MatSnackBarModule,
-    StorageServiceModule
+    StorageServiceModule,
+    MatButtonToggleModule
   ],
   entryComponents: [
         MetricDialogComponent

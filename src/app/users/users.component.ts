@@ -35,7 +35,7 @@ export class UsersComponent implements OnInit {
     this.filteredStates = this.stateCtrl.valueChanges
       .pipe(
         startWith(''),
-        map(state => state ? this.filterStates(state) : this.states.slice())
+        map(res => res ? this.filterStates(res) : this.states.slice())
       );
   }
 
@@ -54,8 +54,8 @@ export class UsersComponent implements OnInit {
   }
 
   filterStates(name: string) {
-    return this.states.filter(state =>
-      state['Dataset-PLD'].toLowerCase().indexOf(name.toLowerCase()) === 0);
+    return this.states.filter(res =>
+      res['Dataset-PLD'].toLowerCase().indexOf(name.toLowerCase()) === 0);
   }
 
 }

@@ -39,17 +39,13 @@ export class AssessmentStatsComponent implements OnInit {
 
 
   update(){
-  	//console.log('Update called')
-  	  	this.data.getpending().subscribe((res)=>{
+  	this.data.getpending().subscribe((res)=>{
   		this.pending = res.Results
-  		//console.log(this.pending)
   	})
   	this.data.getsuccessful().subscribe((res)=>{
   		this.successful = res.Results
-  		//console.log(this.successful)
   	})
   	this.data.getfailed().subscribe((res)=>{
-  		//console.log(res)
   		this.failed = res.Results
   	})
 

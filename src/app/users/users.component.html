@@ -3,16 +3,16 @@
 <ul>
 	<li>
 		<form class="example-form">
-  <mat-form-field class="example-full-width">
-    <input matInput placeholder="Choose Dataset" aria-label="State" [matAutocomplete]="auto" [formControl]="stateCtrl">
-    <mat-autocomplete #auto="matAutocomplete">
-      <mat-option (click)="setLabel(state['Dataset-PLD'])" routerLink = "/details" *ngFor="let state of filteredStates | async" [value]="state['Dataset-PLD']">
-        <span>{{ state['Dataset-PLD'] }}</span> |
-        <strong><small>{{state['Rank-Value']}}</small></strong>
-      </mat-option>
-    </mat-autocomplete>
-  </mat-form-field>
-</form>
+		  <mat-form-field class="example-full-width">
+		    <input matInput placeholder="Choose Dataset" [matAutocomplete]="auto" [formControl]="stateCtrl">
+		    <mat-autocomplete #auto="matAutocomplete">
+		      <mat-option (click)="setLabel(state['Dataset-PLD'])" routerLink = "/details" *ngFor="let state of filteredStates | async" [value]="state['Dataset-PLD']">
+		        <span>{{ state['Dataset-PLD'] }}</span> |
+		        <strong><small>{{state['Rank-Value']}}</small></strong>
+		      </mat-option>
+		    </mat-autocomplete>
+		  </mat-form-field>
+		</form>
 	</li>
 </ul>
 <div class="center" *ngIf="showSpinner"><mat-spinner></mat-spinner></div>

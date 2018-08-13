@@ -76,22 +76,6 @@ export class DataService {
   	return this.http.post<Object[]>('http://0.0.0.0:8080/Luzzu/v4/dataset/rank/weighted',body)
   }
 
-
-  // getRanks(req){
-  //     const body = new HttpParams()
-  //   .set(' ',req)
-
-  //   console.log(body)
-  //       return this.http.post<Object[]>('http://localhost:8080/Luzzu/v4/dataset/rank/weighted/',
-  //   body.toString(),
-  //   {
-  //     headers: new HttpHeaders()
-  //       .set('Content-Type', 'application/json')
-  //   }
-  // );
-  // }
-
-
   //http://localhost:8080/Luzzu/v4/dataset/rank
 //http://0.0.0.0:8080/Luzzu/v4/dataset/rank/weighted/
 	getFacets(){
@@ -104,6 +88,10 @@ export class DataService {
 
   getLODdata(){
   return this.http.get<LOD[]>("/assets/data/LODdata.json")
+  }
+
+  getConfigurations(){
+  return this.http.get<Object[]>("/assets/data/Configurations.json")
   }
 
   getMetricThresholdData(){

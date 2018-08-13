@@ -1,37 +1,44 @@
 <nav>
 	<ul>
-		<li matTooltip="Home">
-			<a routerLink="" [class.activated]="currentUrl=='/'">
-				<i class="material-icons">home</i>
-				
-			</a>
-		</li>
-		<li matTooltip="Dataset Profiles">
-			<a routerLink="users" [class.activated]="currentUrl=='/users'">
-				<i class="material-icons" title="Datasets Page">supervised_user_circle</i>
-				
-			</a>
-		</li>
+		<div *ngIf="showHome">
+			<li matTooltip="Home">
+				<a routerLink="" [class.activated]="currentUrl=='/'">
+					<i class="material-icons">home</i>
+					
+				</a>
+			</li>
+		</div>
+		<div *ngIf="showPosts">
+			<li matTooltip="Dataset Profiles">
+				<a routerLink="users" [class.activated]="currentUrl=='/users'">
+					<i class="material-icons" title="Datasets Page">supervised_user_circle</i>
+					
+				</a>
+			</li>
+		</div>
+		<div *ngIf="showDatasets">
+			<li matTooltip="User-Weighed Ranking">
+				<a routerLink="posts" [class.activated]="currentUrl=='/posts'">
+					<i class="material-icons">message</i>
 
-		<li matTooltip="User-Weighed Ranking">
-			<a routerLink="posts" [class.activated]="currentUrl=='/posts'">
-				<i class="material-icons">message</i>
-
-			</a>
-		</li>
-		<li matTooltip="Visualisation" >
-			<a routerLink="visualise" [class.activated]="currentUrl=='/visualise'">
-				<i class="material-icons">signal_cellular_alt</i>
-			</a>
-		</li>
-		<div *ngIf="Assessment">
+				</a>
+			</li>
+		</div>
+		<div *ngIf="showVisualisation">
+			<li matTooltip="Visualisation" >
+				<a routerLink="visualise" [class.activated]="currentUrl=='/visualise'">
+					<i class="material-icons">signal_cellular_alt</i>
+				</a>
+			</li>
+		</div>
+		<div *ngIf="showAssessment">
 			<li matTooltip="Assessment">
 				<a routerLink="assess" [class.activated]="currentUrl=='/assess'">
 					<i class="material-icons">create</i>
 				</a>
 			</li>
 		</div>
-		<div *ngIf="Assessment_Stats">
+		<div *ngIf="showAssessmentStats">
 			<li matTooltip="Assessment Stats">
 				<a routerLink="assessmentstats" [class.activated]="currentUrl=='/assessmentstats'">
 					<i class="material-icons">done_outline</i>

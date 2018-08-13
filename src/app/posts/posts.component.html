@@ -31,16 +31,19 @@
 	<ul>
 		<li>
 			<button mat-fab color="primary" (click)="AssembleR()" routerLink="/users" style="float: right;">Rank!</button>
+			
+		<div *ngIf="showSaveRanking">
 			<form class="example-form">
-			<font color="#233D4D"><strong>Save Ranking Option ?</strong></font>
-		<mat-form-field class="example-full-width">
-	    	 <input matInput placeholder="Ranking Name" [formControl]="NameForm">
-	  	</mat-form-field>
-	  	<mat-form-field class="example-full-width">
-	    	 <textarea matInput placeholder="Description" [formControl]="DescriptionForm"></textarea>
-	  	</mat-form-field>
+				<font color="#233D4D"><strong>Save Ranking Option ?</strong></font>
+				<mat-form-field class="example-full-width">
+		    		<input matInput placeholder="Ranking Name" [formControl]="NameForm">
+		  		</mat-form-field>
+		  		<mat-form-field class="example-full-width">
+		    		<textarea matInput placeholder="Description" [formControl]="DescriptionForm"></textarea>
+		  		</mat-form-field>
 			</form>
 			<button mat-raised-button color="accent" (click)="SavingRanking()" style="float: left;">Save</button>
+		</div>
 		</li>			
 	</ul>
 </div>
