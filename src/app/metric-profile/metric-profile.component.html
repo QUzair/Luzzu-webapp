@@ -2,8 +2,8 @@
 	<li>
 		
  		<h2>{{metric['Metric-Label']}}</h2>
- 		<p><strong><font color="#233D4D">Category</font></strong> : {{metric['Category']}}</p>
- 		<p><strong><font color="#579C87">Dimension</font></strong> : {{metric['Dimension']}}</p>
+ 		<p><strong>Category</strong> : {{metric['Category']}}</p>
+ 		<p><strong>Dimension</strong> : {{metric['Dimension']}}</p>
  		<p><strong>Type :</strong> {{metric['Observations'][0]['Value-Type']}}</p>
  		<p><strong>Date Computed :</strong> {{metric['Observations'][0]['Date-Computed']}}</p>
  		<p><strong>Graph-URI :</strong> {{metric['Observations'][0]['Graph-URI']}}</p>
@@ -11,7 +11,7 @@
 
  		<div *ngIf="ETU">
 	 		<p><strong>Estimation-Technique-Used : </strong>
-	 			<a href="{{profileProperties['Estimation-Technique-Used']}}" disabled="!(profileProperties['Estimation-Technique-Used-ValueType']=='URI')" target="_blank">{{profileProperties['Estimation-Technique-Used']}}</a>
+	 			<a class="ET-link" href="{{profileProperties['Estimation-Technique-Used']}}" disabled="!(profileProperties['Estimation-Technique-Used-ValueType']=='URI')" target="_blank"><span>{{profileProperties['Estimation-Technique-Used']}}</span></a>
 	 		</p>
 	 	</div>
 	 	<div *ngIf="EP">
@@ -32,8 +32,8 @@
 			<li>
 				<div class="row">
 				  <div class="column" *ngIf="barChart">
-				  	<h4>Triples Assessed</h4>
-				  	<canvas id="bar">{{barChart}}</canvas>
+				  			<h4>Triples Assessed</h4>
+				  			<canvas id="bar">{{barChart}}</canvas>
 				  </div>
 				  <div class="column" *ngIf="donut">
 				  	<h4>Quality</h4>

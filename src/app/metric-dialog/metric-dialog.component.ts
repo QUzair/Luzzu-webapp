@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 export interface DialogData {
   metrics:any[] 
@@ -21,6 +22,13 @@ export class MetricDialogComponent implements OnInit {
 
   ngOnInit() {
   	console.log(this.data.metrics)
+  }
+
+  boolValue(x){
+    if(x==0){
+      return 'false'
+    }
+    else return 'true'
   }
 
 }

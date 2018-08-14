@@ -33,7 +33,7 @@ interface assessdata {
   Results: Object[]
 }
 
-export class State {
+export class DATASET {
   constructor(public dataset: string, public graphUri: string, public rankedValue: number) {
    }
 }
@@ -83,7 +83,7 @@ export class DataService {
 	}
 
 	getRanking(){
-	return this.http.get<State[]>("/assets/data/rankedDatasets1.json")
+	return this.http.get<DATASET[]>("/assets/data/rankedDatasets1.json")
 	}
 
   getLODdata(){

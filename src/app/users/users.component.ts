@@ -3,6 +3,7 @@ import { DataService } from '../data.service';
 import {FormControl} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
+import { Router, NavigationEnd} from '@angular/router'
 
 // export class State {
 //   constructor(public 'Dataset-PLD': string, public graphUri: string, public rankedValue: number) {
@@ -30,7 +31,7 @@ export class UsersComponent implements OnInit {
   stateCtrl: FormControl;
   filteredStates: Observable<any[]>;
 
-  constructor(private data: DataService) { 
+  constructor(private data: DataService, private router: Router) { 
     this.stateCtrl = new FormControl();
     this.filteredStates = this.stateCtrl.valueChanges
       .pipe(
@@ -57,6 +58,16 @@ export class UsersComponent implements OnInit {
     return this.states.filter(res =>
       res['Dataset-PLD'].toLowerCase().indexOf(name.toLowerCase()) === 0);
   }
+
+  fixedEncodeURI(str) {
+    return encodeURIComponent(str)
+}
+
+  precise(x) {
+    return Number.parseFloat(x).toFixed(2);
+}
+
+
 
 }
 

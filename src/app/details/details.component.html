@@ -2,17 +2,17 @@
 <ul>
 	<li><h2>{{label}}</h2></li>
 	<li>
-		<h3>Details</h3>
-		<h4>Assessment Logs</h4>
+		<h3>Assessment Dates</h3>
 		<mat-button-toggle-group #group="matButtonToggleGroup" vertical>
 		  <mat-button-toggle (click)="DisplayLatest()" value='Latest'>
-		    All
+		    Latest
 		  </mat-button-toggle>
 		  <mat-button-toggle *ngFor="let date of AssessDates['Assessment-Dates']" (click)="newDate(date)" value={{date}}>
 		    {{date}}
 		  </mat-button-toggle>
 		</mat-button-toggle-group>
-		<div class="selected-value"><strong>Showing Date:</strong> {{group.value}}</div>
+		<div class="selected-value"><strong>Showing Date:</strong></div><div *ngIf="!group.value" class="selected-value"> Latest </div><div class="selected-value"> {{group.value}} </div>
+		<mat-error *ngIf="Syntax_boolean">Data has Syntax Errors and is unable to be assessed over any other Metrics</mat-error>
 	</li>
 </ul>	
 <ul>					
@@ -67,13 +67,12 @@
 	      Min and Max Values are <strong>required</strong>
 	    </mat-error>
 	    <div (click)="filter()"><i class="material-icons">filter_list</i>	<button mat-button [disabled]="(maxForm.value-minForm.value)<0 || minForm.hasError('required')">Filter</button></div>
-
 	  </mat-expansion-panel>
 	</div>
 </ul>
 
 <mat-tab-group>
-  <mat-tab label="Profile Dashboard"> 
+  <mat-tab label="Quality Metadata Visualisation"> 
 	<ul>
 		<li>
 			<h3>Radar Chart</h3>
@@ -96,13 +95,28 @@
         <div class="Left">
         	<ul>		
 				<li (click)="openDialog()"><i class="material-icons">settings_applications</i>	<button mat-button>Configure Metric Thresholds</button></li>
-				<li>Current Value <br> <font color="#A1C181">Threshold Value</font><br> <font color="#8B008B">LOD Data Avg.</font></li>
+				<li>Current Value <br> <font color="#A1C181">Threshold Value</font><br></li>
 				<div *ngIf="!filterMetrics">
 					<div  *ngFor="let metric of quality_metrics; let i=index" (click)="quality_metrics[i].show=!quality_metrics[i].show">
 						<div id="mydiv" style="background:white" onmouseover="this.style.background='gray';" onmouseout="this.style.background='white';">
-						<li (click)="newMetricProfile(metric)">{{metric['Metric-Label']}}
-							<h5>{{metric['Observations'][0].Value}}    <font color="#A1C181">{{metric.weight}}</font></h5>
-							<mat-progress-bar mode="determinate" [value]="(quality_metrics[i]['Observations'][0].Value/quality_metrics[i].weight)*100"></mat-progress-bar>
+						<li (click)="newMetricProfile(metric)">
+							{{metric['Metric-Label']}}
+							<h5>
+								<div *ngIf="metric['Observations'][0]['Value-Type']==='Double'">
+									{{precise(metric['Observations'][0].Value)}} % <font color="#A1C181">{{precise(metric.weight)}} %</font>
+									<div><mat-progress-bar class="progress-bar" mode="determinate" [value]="(quality_metrics[i]['Observations'][0].Value/quality_metrics[i].weight)*100"></mat-progress-bar></div>
+								</div>   
+								<div *ngIf="metric['Observations'][0]['Value-Type']==='Boolean'">
+									{{(metric['Observations'][0].Value)}} 
+									<font color="#A1C181">{{boolValue(metric.weight)}}</font>
+									<div><mat-progress-bar class="progress-bar" mode="determinate" [value]="booleanBar(quality_metrics[i]['Observations'][0].Value,quality_metrics[i].weight)"></mat-progress-bar></div>
+								</div> 
+								<div *ngIf="metric['Observations'][0]['Value-Type']==='Integer'">
+									{{metric['Observations'][0].Value}} 
+									<font color="#A1C181">{{metric.weight}}</font>
+									<div><mat-progress-bar class="progress-bar" mode="determinate" [value]="(quality_metrics[i]['Observations'][0].Value/quality_metrics[i].weight)*100"></mat-progress-bar></div>
+								</div>  
+								</h5>
 						</li>
 						</div>
 					</div>

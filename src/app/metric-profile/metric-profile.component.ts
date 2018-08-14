@@ -26,6 +26,7 @@ export class MetricProfileComponent implements OnInit {
 
   ETU = false
   EP = false
+  showTripleChart = true
 
   chartcounter = 0
   timGraphCounter = 0 
@@ -237,6 +238,7 @@ export class MetricProfileComponent implements OnInit {
   }
 
    addBarData(chart, total, assessed) {
+
      if(total===undefined){
        total=0
        console.log(total)
@@ -245,6 +247,9 @@ export class MetricProfileComponent implements OnInit {
        assessed=0
        console.log(assessed)
      } 
+console.log('Creating graph')
+console.log(total)
+console.log(assessed)
 
      try{
       chart.data.datasets[0].data[0] = total
@@ -294,13 +299,13 @@ export class MetricProfileComponent implements OnInit {
       console.log(`data: ${data}`)
       console.log(`Time: ${this.dates}`)
       chart.data.datasets[0].data = data
+      chart.data.datasets[0].label = this.metric['Metric-Label']
       chart.update();
     }catch(err){
       console.log(err)
     }
 
   }
-  
 
   DatesCall(r,visData){
           console.log(r)

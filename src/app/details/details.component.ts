@@ -29,7 +29,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 })
 export class DetailsComponent implements OnInit {
 
-
+  DatasetURL:string
   Dimen: string[] = ['Categories', 'Dimensions', 'Metrics'];
 
   CategoriesF = new FormControl();
@@ -42,6 +42,8 @@ export class DetailsComponent implements OnInit {
     Validators.required
   ]);
 
+  CountMetric = 'Unknown'
+  Syntax_boolean = false
   showProfilePage=false
   CatList = [] 
   DimList = []
@@ -65,8 +67,12 @@ export class DetailsComponent implements OnInit {
   name: "Uzair";
   AssessDates = []
   msg:any
-  constructor(private data: DataService, private vdata: VDataService, public dialog: MatDialog) {
-  	
+  constructor(private data: DataService, private vdata: VDataService, public dialog: MatDialog, private route: ActivatedRoute) {
+  	this.route.params.subscribe((params) => {
+      console.log(`Dataset URL: ${decodeURIComponent(params.id)}`)
+      this.label = decodeURIComponent(params.id)
+      this.data.changeLabel(this.label)
+    })
    }
 
   ngOnInit() {
@@ -75,13 +81,11 @@ export class DetailsComponent implements OnInit {
       this.msg = res
     })
     
-    this.data.Current_Label.subscribe((res) =>{
-      this.label = res
       this.data.getAssessmentdates(this.label).subscribe((res)=>{
         this.AssessDates=res
         console.log(this.AssessDates)
       })
-    })
+
 
     this.data.getFacets()
     .subscribe(
@@ -110,19 +114,29 @@ export class DetailsComponent implements OnInit {
   loadMetrics(){
     this.vdata.vsQuality(this.label).subscribe(
       (data)=>{
+        let threshVal = 0
         console.log(data)
         this.quality_metrics = data.Metrics
         
         for(let i in this.quality_metrics){
+
+          if(this.quality_metrics[i]['Metric-Label']==='Syntax Error')
+            if(this.quality_metrics[i].Observations[0]['Value']==1) this.Syntax_boolean = true
+
           console.log(this.quality_metrics[i].Observations[0]['Value-Type'])
           if(this.quality_metrics[i].Observations[0]['Value-Type']==="Double")
             this.quality_metrics[i].Observations[0]['Value']=this.quality_metrics[i].Observations[0]['Value']*100
 
+          if(this.quality_metrics[i].Observations[0]['Value-Type']==='Double') threshVal = 100
+            else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Integer') threshVal = 1000
+              else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Boolean') threshVal = 0
+                else threshVal = 0
+
           Object.defineProperty(this.quality_metrics[i],'weight',{
-              value: 100,
+              value: threshVal,
               writable:true,
               configurable:true
-            });
+            })
         }
         console.log(this.quality_metrics)
 
@@ -285,6 +299,7 @@ export class DetailsComponent implements OnInit {
     this.showProfilePage=true
     //console.log(`Sending to child ${label}`)
     this.data.changeMetricName(label)
+
   }
 
   filter(){
@@ -318,7 +333,7 @@ export class DetailsComponent implements OnInit {
 
   newDate(date){
     console.log(date)
-
+    let threshVal = 0
       this.data.MetricsForDated(this.label,date).subscribe(
       (data)=>{
         console.log(data)
@@ -329,11 +344,16 @@ export class DetailsComponent implements OnInit {
           if(this.quality_metrics[i].Observations[0]['Value-Type']==="Double")
             this.quality_metrics[i].Observations[0]['Value']=this.quality_metrics[i].Observations[0]['Value']*100
 
+          if(this.quality_metrics[i].Observations[0]['Value-Type']==='Double') threshVal = 100
+            else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Integer') threshVal = 1000
+              else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Boolean') threshVal = 0
+                else threshVal = 0
+
           Object.defineProperty(this.quality_metrics[i],'weight',{
-              value: 100,
+              value: threshVal,
               writable:true,
               configurable:true
-            });
+            })
         }
         console.log(this.quality_metrics)
 
@@ -387,6 +407,7 @@ export class DetailsComponent implements OnInit {
   DisplayLatest(){
         this.vdata.vsQuality(this.label).subscribe(
       (data)=>{
+        let threshVal = 0
         console.log(data)
         this.quality_metrics = data.Metrics
         
@@ -395,11 +416,16 @@ export class DetailsComponent implements OnInit {
           if(this.quality_metrics[i].Observations[0]['Value-Type']==="Double")
             this.quality_metrics[i].Observations[0]['Value']=this.quality_metrics[i].Observations[0]['Value']*100
 
+          if(this.quality_metrics[i].Observations[0]['Value-Type']==='Double') threshVal = 100
+            else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Integer') threshVal = 1000
+              else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Boolean') threshVal = 0
+                else threshVal = 0
+
           Object.defineProperty(this.quality_metrics[i],'weight',{
-              value: 100,
+              value: threshVal,
               writable:true,
               configurable:true
-            });
+            })
         }
         console.log(this.quality_metrics)
 
@@ -460,6 +486,20 @@ export class DetailsComponent implements OnInit {
       console.log(err)
     }
   }
+
+    precise(x) {
+    return Number.parseFloat(x).toFixed(2);
+}
+
+  boolValue(val){
+    if(val==1) return 'true'
+      else return 'false'
+  }
+
+booleanBar(currentVal,threshVal){
+  if(currentVal===threshVal) return 100
+    else return 0
+}
 }
 
 
