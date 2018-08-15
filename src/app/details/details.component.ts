@@ -20,6 +20,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatDividerModule } from '@angular/material/divider';
 
 
 @Component({
@@ -32,15 +33,30 @@ export class DetailsComponent implements OnInit {
   DatasetURL:string
   Dimen: string[] = ['Categories', 'Dimensions', 'Metrics'];
 
-  CategoriesF = new FormControl();
-  DimensionsF = new FormControl();
+  CategoriesF = new FormControl('',[
+      Validators.required
+    ]);
+  DimensionsF = new FormControl('',[
+      Validators.required
+    ]);
 
-   minForm = new FormControl('', [
+
+
+  double_minForm = new FormControl('', [
     Validators.required
   ]);
-   maxForm = new FormControl('', [
+  double_maxForm = new FormControl('', [
     Validators.required
   ]);
+  int_minForm = new FormControl('', [
+    Validators.required
+  ]);
+  int_maxForm = new FormControl('', [
+    Validators.required
+  ]);
+
+  ShowBooleansVal = false
+  ShowThresholds = false
 
   CountMetric = 'Unknown'
   Syntax_boolean = false
@@ -63,8 +79,6 @@ export class DetailsComponent implements OnInit {
   lodData = []
   rlabels1 = []
   rdata1 = []
-  animal: "Dog"
-  name: "Uzair";
   AssessDates = []
   msg:any
   constructor(private data: DataService, private vdata: VDataService, public dialog: MatDialog, private route: ActivatedRoute) {
@@ -304,8 +318,12 @@ export class DetailsComponent implements OnInit {
 
   filter(){
     console.log('working')
-    console.log(this.minForm.value)
-    console.log(this.maxForm.value)
+    console.log(this.double_minForm.value)
+    console.log(this.double_maxForm.value)
+    console.log(this.int_minForm.value)
+    console.log(this.int_maxForm.value)
+    console.log(this.ShowBooleansVal)
+
     let arr = []
 
     for(let qm in this.quality_metrics){
@@ -314,12 +332,26 @@ export class DetailsComponent implements OnInit {
           console.log(`Found category ${this.quality_metrics[qm]}`)
           for(let d in this.DimensionsF.value){
             if(this.DimensionsF.value[d]==this.quality_metrics[qm].Dimension){
+
               console.log(`Found dimension ${this.quality_metrics[qm]}`)
-              console.log(this.quality_metrics[qm].Observations[0].Value)
-              if(this.quality_metrics[qm].Observations[0].Value>this.minForm.value && this.quality_metrics[qm].Observations[0].Value<this.maxForm.value){
-                console.log(`Found values ${this.quality_metrics[qm]}`)
-                arr.push(this.quality_metrics[qm])
-                console.log(arr)
+              let mVal = this.quality_metrics[qm].Observations[0].Value
+              let mType = this.quality_metrics[qm].Observations[0]['Value-Type']
+
+              if(mType==='Double'){
+                if(mVal>=this.double_minForm.value && mVal<=this.double_maxForm.value){
+                  console.log(`Found values ${this.quality_metrics[qm]}`)
+                  arr.push(this.quality_metrics[qm])
+                }
+              }
+              else if(mType==='Integer'){
+                if(mVal>=this.int_minForm.value && mVal<=this.int_maxForm.value){
+                  console.log(`Found values ${this.quality_metrics[qm]}`)
+                  arr.push(this.quality_metrics[qm])
+                }
+              }
+              else if(mType==='Boolean'){
+                if(mVal===this.ShowBooleansVal)
+                  arr.push(this.quality_metrics[qm])
               }
             }
           }
@@ -500,6 +532,32 @@ booleanBar(currentVal,threshVal){
   if(currentVal===threshVal) return 100
     else return 0
 }
+
+ exists(label) {
+   try {
+     let arr = this.CategoriesF.value.filter(res => res == label)
+     if (arr.length > 0) return false
+     else return true
+   } catch (err) {
+     //console.log(err)
+     return false
+   }
+ }
+
+SelectedCatF(){
+  try{
+      if(this.CategoriesF!=undefined){
+    if(this.CategoriesF.value.length>0)
+      return false
+    else return true
+  }
+  else return false
+} catch {
+  return false
+}
+
+}
+
 }
 
 

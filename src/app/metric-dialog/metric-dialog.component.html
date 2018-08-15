@@ -2,18 +2,32 @@
 <div mat-dialog-content>
 	<ul>
 		<div *ngFor="let metric of data.metrics; let m=index">
+			<div class="fields">
 				<div *ngIf="metric.Observations[0]['Value-Type']==='Double'">
-					<h3 class="Quality">{{metric['Metric-Label']}}<mat-slider thumbLabel tickInterval="auto" min="0" [max]="100" step="1"  [(ngModel)]="metric.weight"></mat-slider></h3>{{metric.weight}}
+					<h3 class="Quality">{{metric['Metric-Label']}}</h3>
+					<mat-slider thumbLabel tickInterval="auto" min="0" [max]="100" step="1"  [(ngModel)]="metric.weight"></mat-slider>
+					{{metric.weight}}
 				</div>
 				<div *ngIf="metric.Observations[0]['Value-Type']==='Integer'">
-					<h3 class="Quality">{{metric['Metric-Label']}}<mat-slider thumbLabel tickInterval="auto" min="0" [max]="1000" step="10"  [(ngModel)]="metric.weight"></mat-slider></h3>{{metric.weight}}
+					<h3 class="Quality">{{metric['Metric-Label']}}</h3>
+					<mat-form-field class="example-full-width">
+						<input matInput  maxlength="11" placeholder="Integer Threshold" [(ngModel)]="metric.weight">
+						<mat-hint align="end">{{metric.weight.length}} / 11</mat-hint>
+				    </mat-form-field>
+					{{metric.weight}}
+					
 				</div>
 				<div *ngIf="metric.Observations[0]['Value-Type']==='Boolean'">
-					<h3 class="Quality">{{metric['Metric-Label']}} <mat-slide-toggle [(ngModel)]="metric.weight"></mat-slide-toggle></h3>{{boolValue(metric.weight)}}
+					<h3 class="Quality">{{metric['Metric-Label']}}</h3>
+					<mat-slide-toggle [(ngModel)]="metric.weight"></mat-slide-toggle>
+					{{boolValue(metric.weight)}}
 				</div>
+			</div>
+			<mat-divider></mat-divider>
 		</div>
 	</ul>
 </div>
+
 
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()"> No Thanks </button>

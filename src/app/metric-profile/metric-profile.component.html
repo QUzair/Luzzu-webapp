@@ -31,14 +31,16 @@
 		<ul>
 			<li>
 				<div class="row">
-				  <div class="column" *ngIf="barChart">
-				  			<h4>Triples Assessed</h4>
-				  			<canvas id="bar">{{barChart}}</canvas>
-				  </div>
-				  <div class="column" *ngIf="donut">
-				  	<h4>Quality</h4>
-				  	<canvas id="donut1">{{ donut }}</canvas>
-				  </div>
+					<div [hidden]="hideTripleChart">
+						<div class="column" *ngIf="barChart">
+							<h4>Triples Assessed</h4>
+							<canvas id="bar">{{barChart}}</canvas>
+						</div>
+					</div>
+			  		<div class="column" *ngIf="donut" style="float:middle;">
+			  			<h4>Quality</h4>
+			  				<canvas id="donut1">{{ donut }}</canvas>
+			 		</div>
 				</div>
 			</li>
 
@@ -51,6 +53,7 @@
 		</ul>
 	</li>
 </ul>
+
 
 
 

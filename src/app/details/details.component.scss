@@ -6,7 +6,8 @@
 }
 
 .progress-bar{
-  margin-top:15px
+  padding-top: 10px;
+  margin-top:20px;
 }
 
 .example-full-width {
@@ -71,5 +72,13 @@ WebKit inertia scrolling is being added here for any present/future devices that
   padding: 5px
 }
 
+.FilterFields {
+    margin: 15px 0;
+  padding: 5px
+}
 
+.ThresholdText {
+  float:right;
+  color: #A1C181;
+}
 

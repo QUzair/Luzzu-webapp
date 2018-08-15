@@ -26,7 +26,7 @@ export class MetricProfileComponent implements OnInit {
 
   ETU = false
   EP = false
-  showTripleChart = true
+  hideTripleChart = true
 
   chartcounter = 0
   timGraphCounter = 0 
@@ -188,7 +188,8 @@ export class MetricProfileComponent implements OnInit {
   }
 
   TriplesChart(total,assessed){
-
+    if(total==0) this.hideTripleChart = false
+      else if(total>0) this.hideTripleChart = true
     this.barChart = new Chart('bar', {
       type: 'bar',
       data: {
@@ -209,7 +210,7 @@ export class MetricProfileComponent implements OnInit {
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
         legend: {
           position: 'top',
         },
@@ -239,17 +240,21 @@ export class MetricProfileComponent implements OnInit {
 
    addBarData(chart, total, assessed) {
 
+     if(total==0) this.hideTripleChart = true
+       else this.hideTripleChart  = false
+
      if(total===undefined){
        total=0
+       this.hideTripleChart = true
        console.log(total)
      }
      if(assessed===undefined){
        assessed=0
        console.log(assessed)
      } 
-console.log('Creating graph')
-console.log(total)
-console.log(assessed)
+    console.log('Creating graph')
+    console.log(total)
+    console.log(assessed)
 
      try{
       chart.data.datasets[0].data[0] = total

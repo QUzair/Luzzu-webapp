@@ -1,4 +1,4 @@
-<h1>Profile</h1>
+<h1>Quality Metadata Visualisation</h1>
 <ul>
 	<li><h2>{{label}}</h2></li>
 	<li>
@@ -15,9 +15,14 @@
 		<mat-error *ngIf="Syntax_boolean">Data has Syntax Errors and is unable to be assessed over any other Metrics</mat-error>
 	</li>
 </ul>	
-<ul>					
+<ul>	
 	<li>
-		<mat-slide-toggle class="example-margin" [(ngModel)]="filterMetrics">
+		<mat-slide-toggle [(ngModel)]="ShowThresholds">
+			Thresholds
+		</mat-slide-toggle>
+	</li>				
+	<li>
+		<mat-slide-toggle [(ngModel)]="filterMetrics">
 			Filter
 		</mat-slide-toggle>
 	</li>
@@ -32,47 +37,88 @@
 	        Select What type of Metrics you wish to view
 	      </mat-panel-description>
 	    </mat-expansion-panel-header>
-
+<form>
 		<mat-form-field>
 		  <mat-select placeholder="Categories" [formControl]="CategoriesF" multiple>
-		    <mat-option (click)="showDimen=true" *ngFor="let cat of CatList" [value]="cat">{{cat}}</mat-option>
+		    <mat-option *ngFor="let cat of CatList" [value]="cat">{{cat}}</mat-option>
 		  </mat-select>
 		</mat-form-field>
 		<br>
-			<mat-form-field>
-			  <mat-select placeholder="Dimensions" [formControl]="DimensionsF" multiple>
-			    <mat-option>-- None --</mat-option>
-			    <mat-optgroup *ngFor="let group of posts$" [label]="group.Label">
-			      <mat-option *ngFor="let dimen of group.Dimensions" [value]="dimen.Label">
-			        {{dimen.Label}}
-			      </mat-option>
-			    </mat-optgroup>
-			  </mat-select>
-			</mat-form-field>
-
-		<mat-form-field class="example-full-width">
-	    	 <input matInput placeholder="Min Value" [formControl]="minForm">
+		<mat-form-field>
+		  <mat-select placeholder="Dimensions"  [formControl]="DimensionsF" multiple>
+		    <mat-optgroup *ngFor="let group of posts$" [label]="group.Label" [disabled]="exists(group.Label)">
+		      <mat-option *ngFor="let dimen of group.Dimensions" [value]="dimen.Label">
+		        {{dimen.Label}}
+		      </mat-option>
+		    </mat-optgroup>
+		  </mat-select>
+		</mat-form-field>
+</form>
+<mat-divider></mat-divider>
+<!--Double Filter Field-->
+	<div class="FilterFields">
+		<h3>Double</h3>
+		<mat-form-field>
+	    	<input matInput placeholder="Min Value" [formControl]="double_minForm">
+	  	</mat-form-field><br>
+	  	<mat-form-field>
+	    	<input matInput placeholder="Max Value" [formControl]="double_maxForm">
 	  	</mat-form-field>
-	  	<mat-form-field class="example-full-width">
-	    	 <input matInput placeholder="Max Value" [formControl]="maxForm">
-	  	</mat-form-field>
-	  	 <mat-error *ngIf="(maxForm.value-minForm.value)<0">
+	  	 <mat-error *ngIf="(double_maxForm.value-double_minForm.value)<0">
 	      Minimum can not be greater than Maximum
 	      Min: {{minForm.value}} Max: {{maxForm.value}} {{maxForm.value-minForm.value}}
 	    </mat-error>
-	    <mat-error *ngIf="!(minForm.value>=0 && maxForm.value<=100)">
-	      Please enter value between 0 and 100
+	    <mat-error *ngIf="!(double_minForm.value>=0 && double_maxForm.value<=100)">
+	    	Please enter value between 0 and 100
 	    </mat-error>
-	     <mat-error *ngIf="minForm.hasError('required')">
-	      Min and Max Values are <strong>required</strong>
+	     <mat-error *ngIf="double_minForm.hasError('required')">
+	    	Min and Max Values are <strong>required</strong>
 	    </mat-error>
-	    <div (click)="filter()"><i class="material-icons">filter_list</i>	<button mat-button [disabled]="(maxForm.value-minForm.value)<0 || minForm.hasError('required')">Filter</button></div>
+	</div>
+<mat-divider></mat-divider>
+<!--Integer Filter Field-->
+	<div class="FilterFields">
+		<h3>Integer</h3>
+		<mat-form-field>
+	    	<input matInput placeholder="Min Value" [formControl]="int_minForm">
+	  	</mat-form-field><br>
+	  	<mat-form-field>
+	    	<input matInput placeholder="Max Value" [formControl]="int_maxForm">
+	  	</mat-form-field>
+	  	 <mat-error *ngIf="(int_maxForm.value-int_minForm.value)<0">
+	      Minimum can not be greater than Maximum
+	      Min: {{minForm.value}} Max: {{maxForm.value}} {{maxForm.value-minForm.value}}
+	    </mat-error>
+	    <mat-error *ngIf="!(int_minForm.value>=0 && int_maxForm.value<=100)">
+	    	Please enter value between 0 and 100
+	    </mat-error>
+	     <mat-error *ngIf="int_minForm.hasError('required')">
+	    	Min and Max Values are <strong>required</strong>
+	    </mat-error>
+	</div>
+<mat-divider></mat-divider>
+	<!--Boolean Filter Field-->
+	<div class="FilterFields">
+	<h3>Boolean</h3>
+		Boolean Values
+		<mat-slide-toggle class="selected-value" [(ngModel)]="ShowBooleansVal">
+			{{ShowBooleansVal}}
+		</mat-slide-toggle>
+	</div>
+
+
+<mat-divider></mat-divider>
+
+	    <div (click)="filter()"><i class="material-icons">filter_list</i>	<button mat-button [disabled]="(double_maxForm.value-double_minForm.value)<0 || double_minForm.hasError('required')">Filter</button></div>
 	  </mat-expansion-panel>
 	</div>
+<mat-divider></mat-divider>
+
+
 </ul>
 
 <mat-tab-group>
-  <mat-tab label="Quality Metadata Visualisation"> 
+  <mat-tab label="Visualisation Dashboard"> 
 	<ul>
 		<li>
 			<h3>Radar Chart</h3>
@@ -94,27 +140,37 @@
   	<div class="Container">
         <div class="Left">
         	<ul>		
-				<li (click)="openDialog()"><i class="material-icons">settings_applications</i>	<button mat-button>Configure Metric Thresholds</button></li>
-				<li>Current Value <br> <font color="#A1C181">Threshold Value</font><br></li>
+				<div *ngIf="ShowThresholds"><li (click)="openDialog()"><i class="material-icons">settings_applications</i>	<button mat-button>Configure Metric Thresholds</button></li></div>
+				<div *ngIf="ShowThresholds"><li><h3>Current Value<br><font color="#A1C181">Threshold Value</font></h3></li></div>
 				<div *ngIf="!filterMetrics">
-					<div  *ngFor="let metric of quality_metrics; let i=index" (click)="quality_metrics[i].show=!quality_metrics[i].show">
+					<div  *ngFor="let metric of quality_metrics; let i=index">
 						<div id="mydiv" style="background:white" onmouseover="this.style.background='gray';" onmouseout="this.style.background='white';">
 						<li (click)="newMetricProfile(metric)">
 							{{metric['Metric-Label']}}
 							<h5>
 								<div *ngIf="metric['Observations'][0]['Value-Type']==='Double'">
-									{{precise(metric['Observations'][0].Value)}} % <font color="#A1C181">{{precise(metric.weight)}} %</font>
-									<div><mat-progress-bar class="progress-bar" mode="determinate" [value]="(quality_metrics[i]['Observations'][0].Value/quality_metrics[i].weight)*100"></mat-progress-bar></div>
+									<div style="float:right;" *ngIf="!ShowThresholds">{{precise(metric['Observations'][0].Value)}} % </div>
+									<div *ngIf="ShowThresholds">
+										<div style="float:left;"> {{precise(metric['Observations'][0].Value)}} %  </div>
+										<div class="ThresholdText">{{precise(metric.weight)}} %</div>
+										<mat-progress-bar class="progress-bar" mode="determinate" [value]="(quality_metrics[i]['Observations'][0].Value/quality_metrics[i].weight)*100"></mat-progress-bar>
+									</div>
 								</div>   
 								<div *ngIf="metric['Observations'][0]['Value-Type']==='Boolean'">
-									{{(metric['Observations'][0].Value)}} 
-									<font color="#A1C181">{{boolValue(metric.weight)}}</font>
-									<div><mat-progress-bar class="progress-bar" mode="determinate" [value]="booleanBar(quality_metrics[i]['Observations'][0].Value,quality_metrics[i].weight)"></mat-progress-bar></div>
+									<div style="float:right;" *ngIf="!ShowThresholds">{{boolValue(metric['Observations'][0].Value)}}</div>
+									<div *ngIf="ShowThresholds">
+										<div style="float:left;"> {{boolValue(metric['Observations'][0].Value)}} </div>
+										<div class="ThresholdText">{{boolValue(metric.weight)}}</div>
+										<mat-progress-bar class="progress-bar" mode="determinate" [value]="booleanBar(quality_metrics[i]['Observations'][0].Value,quality_metrics[i].weight)"></mat-progress-bar>
+									</div>
 								</div> 
 								<div *ngIf="metric['Observations'][0]['Value-Type']==='Integer'">
-									{{metric['Observations'][0].Value}} 
-									<font color="#A1C181">{{metric.weight}}</font>
-									<div><mat-progress-bar class="progress-bar" mode="determinate" [value]="(quality_metrics[i]['Observations'][0].Value/quality_metrics[i].weight)*100"></mat-progress-bar></div>
+									<div style="float:right;" *ngIf="!ShowThresholds">{{metric['Observations'][0].Value}}</div>
+									<div *ngIf="ShowThresholds">
+										<div style="float:left;"> {{metric['Observations'][0].Value}} </div>
+										<div class="ThresholdText">{{metric.weight}}</div>
+										<mat-progress-bar class="progress-bar" mode="determinate" [value]="(quality_metrics[i]['Observations'][0].Value/quality_metrics[i].weight)*100"></mat-progress-bar>
+									</div>
 								</div>  
 								</h5>
 						</li>
@@ -124,11 +180,41 @@
 
 				<div *ngIf="filterMetrics">
 					<div  *ngFor="let Fmetric of Filteredmetrics; let s=index">
-						<li (click)="newMetricProfile(Fmetric)">{{Fmetric['Metric-Label']}}
-							<h5>{{Fmetric['Observations'][0].Value}}    <font color="#A1C181">{{Fmetric.weight}}</font></h5>
-							<mat-progress-bar mode="determinate" [value]="(Fmetric['Observations'][0].Value/Fmetric.weight)*100"></mat-progress-bar>
-
+						<li (click)="newMetricProfile(Fmetric)">
+							{{Fmetric['Metric-Label']}}
+							<h5>
+								<div *ngIf="Fmetric['Observations'][0]['Value-Type']==='Double'">
+									<div style="float:right;" *ngIf="!ShowThresholds">{{precise(Fmetric['Observations'][0].Value)}} % </div>
+									<div *ngIf="ShowThresholds">
+										<div style="float:left;"> {{precise(Fmetric['Observations'][0].Value)}} %  </div>
+										<div class="ThresholdText">{{precise(Fmetric.weight)}} %</div>
+										<mat-progress-bar class="progress-bar" mode="determinate" [value]="(Fmetric['Observations'][0].Value/Fmetric.weight)*100"></mat-progress-bar>
+									</div>
+								</div>   
+								<div *ngIf="Fmetric['Observations'][0]['Value-Type']==='Boolean'">
+									<div style="float:right;" *ngIf="!ShowThresholds">{{boolValue(Fmetric['Observations'][0].Value)}}</div>
+									<div *ngIf="ShowThresholds">
+										<div style="float:left;"> {{boolValue(Fmetric['Observations'][0].Value)}} </div>
+										<div class="ThresholdText">{{boolValue(Fmetric.weight)}}</div>
+										<mat-progress-bar class="progress-bar" mode="determinate" [value]="booleanBar(Fmetric['Observations'][0].Value,Fmetric.weight)"></mat-progress-bar>
+									</div>
+								</div> 
+								<div *ngIf="Fmetric['Observations'][0]['Value-Type']==='Integer'">
+									<div style="float:right;" *ngIf="!ShowThresholds">{{Fmetric['Observations'][0].Value}}</div>
+									<div *ngIf="ShowThresholds">
+										<div style="float:left;"> {{Fmetric['Observations'][0].Value}} </div>
+										<div class="ThresholdText">{{Fmetric.weight}}</div>
+										<mat-progress-bar class="progress-bar" mode="determinate" [value]="(Fmetric['Observations'][0].Value/Fmetric.weight)*100"></mat-progress-bar>
+									</div>
+								</div>  
+								</h5>
 						</li>
+					</div>
+
+
+
+					<div *ngIf="Filteredmetrics.length==0">
+						<li><mat-error>No Metrics found equating Filter Options</mat-error></li>
 					</div>
 				</div>
 
