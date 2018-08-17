@@ -85,7 +85,7 @@ export class VisualiseComponent implements OnInit {
                     }
               })
 
-  }
+    }
 
   loadBar(rlabels,rdata){
       console.log('Loading Bar chart...')
@@ -99,6 +99,7 @@ export class VisualiseComponent implements OnInit {
                      },
                   "options":
                     {
+                      "fill":true,
                       "elements":
                         {
                           "line":
@@ -117,7 +118,7 @@ export class VisualiseComponent implements OnInit {
                     }
               })
 
-  }
+    }
 
 
   Visualise(){

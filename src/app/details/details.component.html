@@ -3,18 +3,19 @@
 	<li><h2>{{label}}</h2></li>
 	<li>
 		<h3>Assessment Dates</h3>
-		<mat-button-toggle-group #group="matButtonToggleGroup" vertical>
-		  <mat-button-toggle (click)="DisplayLatest()" value='Latest'>
+		<mat-button-toggle-group #group="matButtonToggleGroup" vertical value='Latest'>
+		  <mat-button-toggle (click)="loadMetrics()" value='Latest'>
 		    Latest
 		  </mat-button-toggle>
-		  <mat-button-toggle *ngFor="let date of AssessDates['Assessment-Dates']" (click)="newDate(date)" value={{date}}>
+		  <mat-button-toggle *ngFor="let date of AssessDates" (click)="newDate(date)" value={{date}}>
 		    {{date}}
 		  </mat-button-toggle>
 		</mat-button-toggle-group>
-		<div class="selected-value"><strong>Showing Date:</strong></div><div *ngIf="!group.value" class="selected-value"> Latest </div><div class="selected-value"> {{group.value}} </div>
+		<div class="selected-value"><strong>Showing Date:</strong></div><div class="selected-value"> {{group.value}} </div>
 		<mat-error *ngIf="Syntax_boolean">Data has Syntax Errors and is unable to be assessed over any other Metrics</mat-error>
 	</li>
-</ul>	
+</ul>
+<div [hidden]="Syntax_boolean">	
 <ul>	
 	<li>
 		<mat-slide-toggle [(ngModel)]="ShowThresholds">
@@ -28,7 +29,6 @@
 	</li>
 	<div *ngIf="filterMetrics">
 	  <mat-expansion-panel>
-
 	    <mat-expansion-panel-header>
 	      <mat-panel-title>
 	      	Metric Filter
@@ -114,24 +114,54 @@
 	</div>
 <mat-divider></mat-divider>
 
-
 </ul>
 
 <mat-tab-group>
   <mat-tab label="Visualisation Dashboard"> 
 	<ul>
 		<li>
+			<div class="VisChoices">
+			<mat-button-toggle-group #ChoicesGroup="matButtonToggleGroup" value="Line">
+				<mat-button-toggle *ngFor="let visType of VisChoices" (click)="newChoice(visType)" value={{visType}}>
+			    	{{visType}}
+			  	</mat-button-toggle>
+		  	</mat-button-toggle-group>
+		  </div>
+		</li>
+		<li [hidden]="!(ChoicesGroup.value=='Radar')">
 			<h3>Radar Chart</h3>
-			<div *ngIf="radarChart">
+			<p>This chart presents an areal Visualisation of the Quality Metrics compared to the Linked Open Datasets Metrics  assessed by Luzzu</p>
+			<div *ngIf="radarChart" class="VisChoices">
 				<canvas id="radar1">{{radarChart}}</canvas>
 			</div>
 		</li>
-		<li>
-			<h3>Bar Chart</h3>
-			<div *ngIf="barChart">
-				<canvas id="bar1">{{barChart}}</canvas>
+		<div [hidden]="!(ChoicesGroup.value=='Bar')">
+			<li>
+				<h3>Bar Chart</h3>
+				<p>The Bar Graph Provides a side by side representation of the quality metrics agaisnt the Linked Open Datasets Metrics assessed by Luzzu</p>
+			</li>
+			<li>
+				<div *ngIf="barChart" >
+					<canvas id="bar1">{{barChart}}</canvas>
+				</div>
+			</li>
+
+		</div>
+		<li [hidden]="!(ChoicesGroup.value=='Line')">
+			<h3>Line Chart</h3>
+			<p>The Time Graph shows the progress of all the quality metrics (Doubles) for {{label}} over time</p>
+			<div *ngIf="TimeChart" >
+				<canvas id="timeChart" >{{TimeChart}}</canvas>
 			</div>
 		</li>
+		<div *ngIf="NotFoundLODData.length>0">
+			<li>
+				<mat-error>LOD data not available for </mat-error>
+				<div *ngFor="let notFound of NotFoundLODData">
+					{{notFound['Metric-Label']}}
+				</div>
+			</li>
+		</div>
 	</ul>
   </mat-tab>
 
@@ -227,3 +257,5 @@
 	</ng-template>
   </mat-tab>
 </mat-tab-group>
+</div>
+

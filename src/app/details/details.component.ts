@@ -21,13 +21,27 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatRadioModule } from '@angular/material/radio';
 
+interface Coordinate {
+  x:number,
+  y:number
+}
+
+interface TimeGraphData {
+          label:string,
+          borderColor:string,
+          fill: false,
+          data: Coordinate[]
+        }
 
 @Component({
   selector: 'app-details',
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss']
 })
+
+
 export class DetailsComponent implements OnInit {
 
   DatasetURL:string
@@ -57,6 +71,20 @@ export class DetailsComponent implements OnInit {
 
   ShowBooleansVal = false
   ShowThresholds = false
+  VisChoice = "Radar"
+
+  RadarCounter = 0
+  BarCounter = 0 
+
+
+  DoubleMetrics = []
+  IntMetrics = []
+  BooleanMetrics = []
+
+  doubleLOD = []
+  intLOD = []
+  boolLOD = []
+  NotFoundLODData = []
 
   CountMetric = 'Unknown'
   Syntax_boolean = false
@@ -68,12 +96,14 @@ export class DetailsComponent implements OnInit {
   posts$: Object
   label = "No profile selected";
   quality_metrics = []
-  metricURIs = []
   show = false
   showMetrics = false
+
   chart = []
   radarChart = []
   barChart = []
+  TimeChart = []
+
   lodDataService = []
   labelMetrics = []
   lodData = []
@@ -81,6 +111,9 @@ export class DetailsComponent implements OnInit {
   rdata1 = []
   AssessDates = []
   msg:any
+  VisChoices = ['Radar','Bar','Line']
+  timeFormat = 'YYYY-MM-DD'
+
   constructor(private data: DataService, private vdata: VDataService, public dialog: MatDialog, private route: ActivatedRoute) {
   	this.route.params.subscribe((params) => {
       console.log(`Dataset URL: ${decodeURIComponent(params.id)}`)
@@ -90,14 +123,16 @@ export class DetailsComponent implements OnInit {
    }
 
   ngOnInit() {
+
      this.data.CurrentMetric.subscribe((res)=> {
       console.log(res)
       this.msg = res
     })
     
       this.data.getAssessmentdates(this.label).subscribe((res)=>{
-        this.AssessDates=res
+        this.AssessDates=res['Assessment-Dates']
         console.log(this.AssessDates)
+        this.loadMetrics()
       })
 
 
@@ -107,21 +142,19 @@ export class DetailsComponent implements OnInit {
         this.posts$ = (data.Categories)
         console.log(this.posts$)
 
+        //Creating List of Categories and Dimensions
         for(let c in this.posts$){
           this.CatList.push(this.posts$[c].Label)
           for(let d in this.posts$[c].Dimensions){
             this.DimList.push(this.posts$[c].Dimensions[d].Label)
-            for(let m in this.posts$[c].Dimensions[d].Metrics){
-              this.metricURIs.push((this.posts$[c].Dimensions[d].Metrics[m].URI))        
+            for(let m in this.posts$[c].Dimensions[d].Metrics){    
             }
           }
         }
-    console.log(this.metricURIs)
     console.log(`category list ${this.CatList}`)
     console.log(`dimensions list ${this.DimList}`)
-      }
-    )
-    this.loadMetrics()
+      })
+    
   }
 
 
@@ -132,6 +165,9 @@ export class DetailsComponent implements OnInit {
         console.log(data)
         this.quality_metrics = data.Metrics
         
+        //Checking for Syntax Error
+        //Adding Threshold Weights
+        //Converting value of double to percentage 
         for(let i in this.quality_metrics){
 
           if(this.quality_metrics[i]['Metric-Label']==='Syntax Error')
@@ -152,7 +188,40 @@ export class DetailsComponent implements OnInit {
               configurable:true
             })
         }
+
         console.log(this.quality_metrics)
+
+        //Creating arrays for the different type of metrics
+
+        this.DoubleMetrics = []
+        this.IntMetrics = []
+        this.BooleanMetrics = []
+
+        this.quality_metrics.map((res)=>{
+
+          let MetricType = res.Observations[0]['Value-Type']
+          if(MetricType==='Double'){
+            this.DoubleMetrics.push(res)
+          }
+          else if(MetricType==='Integer'){
+            this.IntMetrics.push(res)
+          }
+          else if(MetricType==='Boolean'){
+            this.BooleanMetrics.push(res)
+          }
+        })
+
+        console.log('Sectioning')
+        console.log(this.DoubleMetrics)
+        console.log(this.IntMetrics)
+        console.log(this.BooleanMetrics)
+
+        let doubleLabels = this.DoubleMetrics.map(res=>res['Metric-Label'])
+        let doubleData = this.DoubleMetrics.map(res=>res.Observations[0]['Value'])
+
+        console.log('Double Labels and Data')
+        console.log(doubleLabels)
+        console.log(doubleData)
 
         this.rlabels1 = this.quality_metrics.map((res)=>{
           return res['Metric-Label']
@@ -167,36 +236,61 @@ export class DetailsComponent implements OnInit {
         console.log(`rlabels: ${this.rlabels1.length} ${this.rlabels1}`)
         console.log(`rdata: ${this.rdata1}`)
         
-
-
+        //Sorting Metrics in Ascending Order of Value
         this.quality_metrics.sort(function(a, b){
           var nameA=(a['Observations'][0]).Value, nameB=(b['Observations'][0]).Value
-          if (nameA < nameB) //sort string ascending
+          if (nameA < nameB) 
             return -1 
           if (nameA > nameB)
             return 1
-          return 0 //default return value (no sorting)
+          return 0 
         })
 
+
+      //Create Time Chart for all metrics
+      this.createTimeChart()
         
       this.data.getLODdata().subscribe((res)=>{
+
         this.lodDataService = res
         console.log(this.lodDataService)
-        console.log(this.quality_metrics)
-        let loddata_temp = []
-        for(let f in this.quality_metrics){
-              for(let s in this.lodDataService){
-                if(this.quality_metrics[f]['Metric-Label']===this.lodDataService[s].name){
-                  console.log(`${this.quality_metrics[f]['Metric-Label']} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
-                  loddata_temp.push(this.lodDataService[s].mean)
-                }
+        this.doubleLOD = []
+        this.intLOD = []
+        this.boolLOD = []
+        this.NotFoundLODData = []
+        let newDoubleData = []
+        let newDoubleLabels = []
+        let LODdataDouble = []
+        let missLOD = []
+        let found = false
+
+          this.DoubleMetrics.map((met)=>{
+            found = false
+            this.lodDataService.map((res)=>{
+              let name = res.name
+              if(name===met['Metric-Label']){
+                newDoubleLabels.push(met['Metric-Label'])
+                newDoubleData.push(met['Observations'][0].Value)
+                LODdataDouble.push(res.mean) 
+                found = true        
               }
-            }
-            this.lodData=loddata_temp
-            console.log(this.lodData)
-            console.log(loddata_temp)
-            this.loadRadar(this.rlabels1,this.rdata1,this.lodData)
-            this.loadBar(this.rlabels1,this.rdata1,this.lodData)
+          })
+            if(!found) missLOD.push(met)
+        })
+
+       console.log(LODdataDouble)
+       console.log(missLOD)
+       console.log(newDoubleData)
+       console.log(newDoubleLabels)
+       this.NotFoundLODData = missLOD
+
+      if(this.RadarCounter++==0)
+        this.loadRadar(newDoubleLabels,newDoubleData,LODdataDouble)
+      else this.addData(this.radarChart,newDoubleLabels,newDoubleData,LODdataDouble)
+
+      if(this.BarCounter++==0)
+        this.loadBar(newDoubleLabels,newDoubleData,LODdataDouble)
+      else this.addData(this.barChart,newDoubleLabels,newDoubleData,LODdataDouble)
       })
     })
   }
@@ -365,85 +459,17 @@ export class DetailsComponent implements OnInit {
 
   newDate(date){
     console.log(date)
-    let threshVal = 0
       this.data.MetricsForDated(this.label,date).subscribe(
-      (data)=>{
-        console.log(data)
-        this.quality_metrics = data.Metrics
-        
-        for(let i in this.quality_metrics){
-          console.log(this.quality_metrics[i].Observations[0]['Value-Type'])
-          if(this.quality_metrics[i].Observations[0]['Value-Type']==="Double")
-            this.quality_metrics[i].Observations[0]['Value']=this.quality_metrics[i].Observations[0]['Value']*100
-
-          if(this.quality_metrics[i].Observations[0]['Value-Type']==='Double') threshVal = 100
-            else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Integer') threshVal = 1000
-              else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Boolean') threshVal = 0
-                else threshVal = 0
-
-          Object.defineProperty(this.quality_metrics[i],'weight',{
-              value: threshVal,
-              writable:true,
-              configurable:true
-            })
-        }
-        console.log(this.quality_metrics)
-
-        this.rlabels1 = this.quality_metrics.map((res)=>{
-          return res['Metric-Label']
-        })
-        this.rdata1 = this.quality_metrics.map((res)=>{
-          console.log((res['Observations'][0]).Value)
-          if((res['Observations'][0]).Value<=100) return (res['Observations'][0]).Value
-          else return 50
-        })
-
-        this.labelMetrics = this.rdata1
-        console.log(`rlabels: ${this.rlabels1.length} ${this.rlabels1}`)
-        console.log(`rdata: ${this.rdata1}`)
-        
-
-
-        this.quality_metrics.sort(function(a, b){
-          var nameA=(a['Observations'][0]).Value, nameB=(b['Observations'][0]).Value
-          if (nameA < nameB) //sort string ascending
-            return -1 
-          if (nameA > nameB)
-            return 1
-          return 0 //default return value (no sorting)
-        })
-
-        
-      this.data.getLODdata().subscribe((res)=>{
-        this.lodDataService = res
-        console.log(this.lodDataService)
-        console.log(this.quality_metrics)
-        let loddata_temp = []
-        for(let f in this.quality_metrics){
-              for(let s in this.lodDataService){
-                if(this.quality_metrics[f]['Metric-Label']===this.lodDataService[s].name){
-                  console.log(`${this.quality_metrics[f]['Metric-Label']} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
-                  loddata_temp.push(this.lodDataService[s].mean)
-                }
-              }
-            }
-            this.lodData=loddata_temp
-            console.log(this.lodData)
-            console.log(loddata_temp)
-            this.addData(this.radarChart,this.rlabels1,this.rdata1,this.lodData)
-            this.addData(this.barChart,this.rlabels1,this.rdata1,this.lodData)
-      })
-    })
-  }
-
-  DisplayLatest(){
-        this.vdata.vsQuality(this.label).subscribe(
       (data)=>{
         let threshVal = 0
         console.log(data)
         this.quality_metrics = data.Metrics
         
         for(let i in this.quality_metrics){
+
+            if(this.quality_metrics[i]['Metric-Label']==='Syntax Error')
+              if(this.quality_metrics[i].Observations[0]['Value']==1) this.Syntax_boolean = true
+
           console.log(this.quality_metrics[i].Observations[0]['Value-Type'])
           if(this.quality_metrics[i].Observations[0]['Value-Type']==="Double")
             this.quality_metrics[i].Observations[0]['Value']=this.quality_metrics[i].Observations[0]['Value']*100
@@ -461,6 +487,36 @@ export class DetailsComponent implements OnInit {
         }
         console.log(this.quality_metrics)
 
+        this.DoubleMetrics = []
+        this.IntMetrics = []
+        this.BooleanMetrics = []
+
+        this.quality_metrics.map((res)=>{
+
+          let MetricType = res.Observations[0]['Value-Type']
+          if(MetricType==='Double'){
+            this.DoubleMetrics.push(res)
+          }
+          else if(MetricType==='Integer'){
+            this.IntMetrics.push(res)
+          }
+          else if(MetricType==='Boolean'){
+            this.BooleanMetrics.push(res)
+          }
+        })
+
+        console.log('Sectioning')
+        console.log(this.DoubleMetrics)
+        console.log(this.IntMetrics)
+        console.log(this.BooleanMetrics)
+
+        let doubleLabels = this.DoubleMetrics.map(res=>res['Metric-Label'])
+        let doubleData = this.DoubleMetrics.map(res=>res.Observations[0]['Value'])
+
+        console.log('Double Labels and Data')
+        console.log(doubleLabels)
+        console.log(doubleData)
+
         this.rlabels1 = this.quality_metrics.map((res)=>{
           return res['Metric-Label']
         })
@@ -474,36 +530,57 @@ export class DetailsComponent implements OnInit {
         console.log(`rlabels: ${this.rlabels1.length} ${this.rlabels1}`)
         console.log(`rdata: ${this.rdata1}`)
         
-
-
+        //Sorting Metrics in Ascending Order of Value
         this.quality_metrics.sort(function(a, b){
           var nameA=(a['Observations'][0]).Value, nameB=(b['Observations'][0]).Value
-          if (nameA < nameB) //sort string ascending
+          if (nameA < nameB) 
             return -1 
           if (nameA > nameB)
             return 1
-          return 0 //default return value (no sorting)
+          return 0 
         })
 
         
       this.data.getLODdata().subscribe((res)=>{
+
         this.lodDataService = res
         console.log(this.lodDataService)
-        console.log(this.quality_metrics)
-        let loddata_temp = []
-        for(let f in this.quality_metrics){
-              for(let s in this.lodDataService){
-                if(this.quality_metrics[f]['Metric-Label']===this.lodDataService[s].name){
-                  console.log(`${this.quality_metrics[f]['Metric-Label']} ${this.lodDataService[s].name} ${this.lodDataService[s].mean}`)
-                  loddata_temp.push(this.lodDataService[s].mean)
-                }
+        this.doubleLOD = []
+        this.intLOD = []
+        this.boolLOD = []
+        let newDoubleData = []
+        let newDoubleLabels = []
+        let LODdataDouble = []
+        let missLOD = []
+        let found = false
+
+          this.DoubleMetrics.map((met)=>{
+            found = false
+            this.lodDataService.map((res)=>{
+              let name = res.name
+              if(name===met['Metric-Label']){
+                newDoubleLabels.push(met['Metric-Label'])
+                newDoubleData.push(met['Observations'][0].Value)
+                LODdataDouble.push(res.mean) 
+                found = true        
               }
-            }
-            this.lodData=loddata_temp
-            console.log(this.lodData)
-            console.log(loddata_temp)
-            this.addData(this.radarChart,this.rlabels1,this.rdata1,this.lodData)
-            this.addData(this.barChart,this.rlabels1,this.rdata1,this.lodData)
+          })
+            if(!found) missLOD.push(met)
+        })
+
+       console.log(LODdataDouble)
+       console.log(missLOD)
+       console.log(newDoubleData)
+       console.log(newDoubleLabels)
+       this.NotFoundLODData = missLOD
+
+      if(this.RadarCounter++==0)
+        this.loadRadar(newDoubleLabels,newDoubleData,LODdataDouble)
+      else this.addData(this.radarChart,newDoubleLabels,newDoubleData,LODdataDouble)
+
+      if(this.BarCounter++==0)
+        this.loadBar(newDoubleLabels,newDoubleData,LODdataDouble)
+      else this.addData(this.barChart,newDoubleLabels,newDoubleData,LODdataDouble)
       })
     })
   }
@@ -547,16 +624,112 @@ booleanBar(currentVal,threshVal){
 SelectedCatF(){
   try{
       if(this.CategoriesF!=undefined){
-    if(this.CategoriesF.value.length>0)
+        if(this.CategoriesF.value.length>0)
+          return false
+        else return true
+      }
+      else return false
+  } catch {
       return false
-    else return true
   }
-  else return false
-} catch {
-  return false
-}
 
 }
+
+newChoice(visType){
+  console.log(visType)
+}
+
+getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+createTimeChart(){
+
+  //DoubleMetrics at this point has the metrics we need to display, so we create the first array of datasets
+  let datasetsTime:TimeGraphData[] = []
+
+  this.DoubleMetrics.map((res)=>{
+    var tmp: TimeGraphData = {
+      label:res['Metric-Label'],
+        borderColor:this.getRandomColor(),
+        fill: false,
+        data: []
+    }
+
+    datasetsTime.push(tmp)
+
+  })
+  console.log(datasetsTime) 
+
+  //Go through AssessDates and fill coordinate points
+  this.DatesCall(datasetsTime,0)
+
+
+}
+
+DatesCall(TimeSets,r){
+  this.data.MetricsForDated(this.label,this.AssessDates[r]).subscribe((data)=>{
+    console.log(data)
+    let x = this.AssessDates[r]
+    //let metrics_rdate = data['Metrics']
+    TimeSets.map((ts_metric)=>{
+      data['Metrics'].map((rd_metric)=>{
+        if(ts_metric.label===rd_metric['Metric-Label']){
+          let coordinate:Coordinate = {
+            x:x,
+            y:rd_metric.Observations[0]['Value']*100
+          }
+          ts_metric.data.push(coordinate)
+        }
+      })
+    })
+     r+=1
+     if(r<this.AssessDates.length) this.DatesCall(TimeSets,r)
+       else if(r==this.AssessDates.length){
+          console.log(TimeSets)
+          this.createTimeGraph(TimeSets)
+       }
+  })
+
+}
+
+createTimeGraph(TimeData){
+      this.TimeChart = new Chart('timeChart',{
+
+      type: 'line',
+      data: {
+        labels: this.AssessDates,
+        datasets: TimeData
+      },
+      options: {
+        scaleShowvalues:true,
+        legend: {
+          display: true
+        },
+scales: {
+          xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: 'Date'
+            }
+          }],
+          yAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: 'value'
+            }
+          }]
+        }
+      }
+    })
+
+}
+
 
 }
 

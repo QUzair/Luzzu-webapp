@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { DataService } from '../data.service';
 import { Observable } from 'rxjs';
-import {MatSliderModule} from '@angular/material/slider';
+import { MatSliderModule } from '@angular/material/slider';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '../material.module';
 import { FormsModule, FormControl } from '@angular/forms'
 import { map, startWith } from 'rxjs/operators'
 import 'hammerjs';
-import {MatRadioModule} from '@angular/material/radio';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';

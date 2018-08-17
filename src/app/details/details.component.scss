@@ -82,3 +82,19 @@ WebKit inertia scrolling is being added here for any present/future devices that
   color: #A1C181;
 }
 
+.VisChoices{
+  height: 100%;
+    padding: 0;
+    margin: 0;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  display: flex;
+  align-items: center;
+
+}
+
