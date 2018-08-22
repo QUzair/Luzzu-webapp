@@ -7,7 +7,7 @@
  		<p><strong>Type :</strong> {{metric['Observations'][0]['Value-Type']}}</p>
  		<p><strong>Date Computed :</strong> {{metric['Observations'][0]['Date-Computed']}}</p>
  		<p><strong>Graph-URI :</strong> {{metric['Observations'][0]['Graph-URI']}}</p>
- 		<p><strong>Comment :</strong><br> {{comment}}</p>
+ 		<p><strong>Metric Description :</strong><br> {{comment}}</p>
 
  		<div *ngIf="ETU">
 	 		<p><strong>Estimation-Technique-Used : </strong>
@@ -29,21 +29,19 @@
 	</li>
 	<li>
 		<ul>
+							
 			<li>
-				<div class="row">
-					<div [hidden]="hideTripleChart">
-						<div class="column" *ngIf="barChart">
-							<h4>Triples Assessed</h4>
-							<canvas id="bar">{{barChart}}</canvas>
+				<div class="box">
+						<div *ngIf="donut" class="Chart">
+							<h4>Quality</h4>
+					  		<canvas id="donut1">{{ donut }}</canvas>
+					  	</div>
+						<div [hidden]="hideTripleChart" *ngIf="barChart" class="Chart">
+								<h4>Triples Assessed</h4>
+								<canvas id="bar">{{barChart}}</canvas>
 						</div>
-					</div>
-			  		<div class="column" *ngIf="donut" style="float:middle;">
-			  			<h4>Quality</h4>
-			  				<canvas id="donut1">{{ donut }}</canvas>
-			 		</div>
 				</div>
 			</li>
-
 			<li>
 				<h4>Progress Over Time</h4>
 				<div *ngIf="chart">
@@ -53,6 +51,10 @@
 		</ul>
 	</li>
 </ul>
+
+
+
+
 
 
 

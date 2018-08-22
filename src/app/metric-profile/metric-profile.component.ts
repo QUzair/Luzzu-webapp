@@ -148,6 +148,7 @@ export class MetricProfileComponent implements OnInit {
     }
     console.log('Dataaa')
     console.log(data)
+    let type = this.metric['Observations'][0]['Value-Type']
     this.chart = new Chart('line1',{
 
       type: 'line',
@@ -178,7 +179,16 @@ export class MetricProfileComponent implements OnInit {
           }],
           yAxes: [{
             ticks:{
-              beginAtZero:true
+              beginAtZero:true,
+              callback: function(value, index, values) {
+                //console.log(`Value in Chart ${value}`)
+                if(type==='Boolean'){
+                  if(value==0) return 'False'
+                  else if(value==1) return 'True'
+                  else return ' '
+                }
+                else return value
+              }
             },
             display:true
           }]
@@ -285,9 +295,14 @@ export class MetricProfileComponent implements OnInit {
 
   addTimeData(chart,visData){
 
+    if(visData[0][0]['Observations'][0]['Value-Type']==='Boolean')
+      console.log('Changing Chart Axis to Boolean')
+
+
     console.log(visData)
     console.log(visData[0][0])
     let data = []
+    let type = this.metric['Observations'][0]['Value-Type']
     for(let d in visData){
       if (!(visData[d] === undefined || visData[d].length == 0)) {
         console.log('Value')
@@ -305,6 +320,21 @@ export class MetricProfileComponent implements OnInit {
       console.log(`Time: ${this.dates}`)
       chart.data.datasets[0].data = data
       chart.data.datasets[0].label = this.metric['Metric-Label']
+      chart.options.scales.yAxes = [{
+            ticks:{
+              beginAtZero:true,
+              callback: function(value, index, values) {
+                //console.log(`Value in Chart ${value}`)
+                if(type==='Boolean'){
+                  if(value==0) return 'False'
+                  else if(value==1) return 'True'
+                  else return ' '
+                }
+                else return value
+              }
+            },
+            display:true
+          }]
       chart.update();
     }catch(err){
       console.log(err)
@@ -335,6 +365,7 @@ export class MetricProfileComponent implements OnInit {
         })
 
   }
+
 
 
 
