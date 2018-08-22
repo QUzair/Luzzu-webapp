@@ -27,7 +27,7 @@ export class MetricProfileComponent implements OnInit {
   ETU = false
   EP = false
   hideTripleChart = true
-
+  metricType = 'Double'
   chartcounter = 0
   timGraphCounter = 0 
   facetOptions = []
@@ -59,6 +59,7 @@ export class MetricProfileComponent implements OnInit {
     this.data.CurrentMetric.subscribe((res)=> {
       let visData = []
       this.metric = res
+      this.metricType  = res['Observations'][0]['Value-Type']
       console.log(this.dataset_label)
       console.log(this.metric)
       this.getComment(this.metric)
@@ -102,7 +103,7 @@ export class MetricProfileComponent implements OnInit {
     			data: {
     				datasets: [{
     					data: [
-    						this.metric['Observations'][0].Value,t,r
+    						this.metric['Observations'][0].Value,t
     					],
                 backgroundColor: [
                     'rgba(205, 255, 0)',
@@ -112,8 +113,7 @@ export class MetricProfileComponent implements OnInit {
     				}],
     				labels: [
     					'LatestValue',
-    					'To reach Threshold',
-    					'To reach 100'
+    					'To reach Threshold'
     				]
     			},
     			options: {
@@ -211,7 +211,7 @@ export class MetricProfileComponent implements OnInit {
                 'rgba(205, 255, 0)',
                 'rgba(255, 59, 119)'
             ],
-          label: 'Dataset 1'
+          label: this.metric['Metric-Label']
         }],
         labels: [
           'Total-Dataset-Triples',
@@ -223,6 +223,15 @@ export class MetricProfileComponent implements OnInit {
         maintainAspectRatio: true,
         legend: {
           position: 'top',
+        },
+        scales: {
+          yAxes : [{
+            ticks:{
+              callback: function(value,index,values) {
+                return Math.floor(value)
+              }
+            }
+          }]
         },
         title: {
           display: true,
@@ -278,15 +287,14 @@ export class MetricProfileComponent implements OnInit {
    addDonutData(chart, latestObs) {
       if(latestObs===undefined) latestObs = 0
       let t = this.metric['weight'] - latestObs
-      let r = 100 - t - latestObs
+
+     
       console.log(latestObs)
       console.log(this.metric['weight'])
       console.log(t)
-      console.log(r)
      try{
       chart.data.datasets[0].data[0] = latestObs
       chart.data.datasets[0].data[1] = t
-      chart.data.datasets[0].data[2] = r
       chart.update();
     }catch(err){
       console.log(err)
@@ -366,6 +374,17 @@ export class MetricProfileComponent implements OnInit {
 
   }
 
+ getStyle(){
+   if(this.metric['Observations'][0]['Value']==0)
+     return 'red'
+   else return 'green'
+ }
+
+getBooleanString(){
+     if(this.metric['Observations'][0]['Value']==0)
+     return 'False'
+   else return 'True'
+}
 
 
 

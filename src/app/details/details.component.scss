@@ -98,3 +98,85 @@ WebKit inertia scrolling is being added here for any present/future devices that
 
 }
 
+.Download-box {
+  display: flex;
+  height: 100%;
+  justify-content: space-evenly;
+  //padding:30px;
+}
+
+.material-icons {
+  margin-bottom: 0.5em; 
+  margin-right: 0.5em;
+}
+
+a span{
+font-size: 0.4em;
+text-decoration: none;
+color:#A9A9A9;
+padding:10px
+}
+
+//Table CSS for Integer and Boolean Tables
+.mat-sort-header-container {
+  align-items: center;
+}
+
+table {
+    font-family: 'Montserrat', sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    text-align: center;
+}
+
+td {
+  position: relative;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  line-height: 2;
+  padding: 8px;
+}
+
+th {
+  position: relative;
+  font-family: 'Montserrat', sans-serif;
+
+   padding: 8px;
+    font-size: 16px;
+  color: #70996E;
+  line-height: 2;
+  background-color: #DCDCDC;
+  text-align: center;
+}
+
+table td:hover {
+  background-color: #639361;
+  color: #fff
+}
+
+table tr:hover {
+  background-color: #97C196;
+}
+
+
+// <table matSort (matSortChange)="sortData($event)">
+//   <thead>
+//   <tr>
+//     <th mat-sort-header="name">Dessert (100g)</th>
+//     <th mat-sort-header="calories">Calories</th>
+//     <th mat-sort-header="fat">Fat (g)</th>
+//     <th mat-sort-header="carbs">Carbs (g)</th>
+//     <th mat-sort-header="protein">Protein (g)</th>
+//   </tr>
+//   </thead>
+
+// <tbody>
+//   <tr *ngFor="let dessert of sortedData">
+//     <td>{{dessert.name}}</td>
+//     <td>{{dessert.calories}}</td>
+//     <td>{{dessert.fat}}</td>
+//     <td>{{dessert.carbs}}</td>
+//     <td>{{dessert.protein}}</td>
+//   </tr>
+// </tbody>
+// </table>

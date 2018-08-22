@@ -222,19 +222,6 @@ export class DetailsComponent implements OnInit {
         console.log('Double Labels and Data')
         console.log(doubleLabels)
         console.log(doubleData)
-
-        this.rlabels1 = this.quality_metrics.map((res)=>{
-          return res['Metric-Label']
-        })
-        this.rdata1 = this.quality_metrics.map((res)=>{
-          console.log((res['Observations'][0]).Value)
-          if((res['Observations'][0]).Value<=100) return (res['Observations'][0]).Value
-          else return 50
-        })
-
-        this.labelMetrics = this.rdata1
-        console.log(`rlabels: ${this.rlabels1.length} ${this.rlabels1}`)
-        console.log(`rdata: ${this.rdata1}`)
         
         //Sorting Metrics in Ascending Order of Value
         this.quality_metrics.sort(function(a, b){

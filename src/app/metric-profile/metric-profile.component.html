@@ -32,7 +32,10 @@
 							
 			<li>
 				<div class="box">
-						<div *ngIf="donut" class="Chart">
+						<div [hidden]="!(metricType==='Boolean')">
+							<div class="BooleanVal" [style.color]="getStyle()">{{getBooleanString()}}</div>
+					  	</div>
+						<div [hidden]="this.metricType==='Boolean'" *ngIf="donut" class="Chart">
 							<h4>Quality</h4>
 					  		<canvas id="donut1">{{ donut }}</canvas>
 					  	</div>
@@ -40,6 +43,7 @@
 								<h4>Triples Assessed</h4>
 								<canvas id="bar">{{barChart}}</canvas>
 						</div>
+
 				</div>
 			</li>
 			<li>
