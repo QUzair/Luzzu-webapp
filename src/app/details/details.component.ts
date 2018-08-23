@@ -22,6 +22,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatSortModule } from '@angular/material/sort';
+
 
 interface Coordinate {
   x:number,
@@ -29,11 +31,20 @@ interface Coordinate {
 }
 
 interface TimeGraphData {
-          label:string,
-          borderColor:string,
-          fill: false,
-          data: Coordinate[]
-        }
+  label:string,
+  borderColor:string,
+  fill: false,
+  data: Coordinate[]
+}
+
+interface TableEntry {
+  'Metric-Label':string,
+  'Value': number,
+  'LODAvg':number,
+  'Date-Computed':string,
+  'Type':string
+  'Percentage':number
+}
 
 @Component({
   selector: 'app-details',
@@ -47,27 +58,30 @@ export class DetailsComponent implements OnInit {
   DatasetURL:string
   Dimen: string[] = ['Categories', 'Dimensions', 'Metrics'];
 
+  Table: TableEntry[] = []
+  sortedData: TableEntry[]
+
   CategoriesF = new FormControl('',[
-      Validators.required
+    Validators.required
     ]);
   DimensionsF = new FormControl('',[
-      Validators.required
+    Validators.required
     ]);
 
 
 
   double_minForm = new FormControl('', [
     Validators.required
-  ]);
+    ]);
   double_maxForm = new FormControl('', [
     Validators.required
-  ]);
+    ]);
   int_minForm = new FormControl('', [
     Validators.required
-  ]);
+    ]);
   int_maxForm = new FormControl('', [
     Validators.required
-  ]);
+    ]);
 
   ShowBooleansVal = false
   ShowThresholds = false
@@ -111,7 +125,7 @@ export class DetailsComponent implements OnInit {
   rdata1 = []
   AssessDates = []
   msg:any
-  VisChoices = ['Radar','Bar','Line']
+  VisChoices = ['Table','Radar','Bar','Line']
   timeFormat = 'YYYY-MM-DD'
 
   constructor(private data: DataService, private vdata: VDataService, public dialog: MatDialog, private route: ActivatedRoute) {
@@ -120,20 +134,22 @@ export class DetailsComponent implements OnInit {
       this.label = decodeURIComponent(params.id)
       this.data.changeLabel(this.label)
     })
-   }
+
+    this.sortedData = this.Table.slice()
+  }
 
   ngOnInit() {
 
-     this.data.CurrentMetric.subscribe((res)=> {
+    this.data.CurrentMetric.subscribe((res)=> {
       console.log(res)
       this.msg = res
     })
     
-      this.data.getAssessmentdates(this.label).subscribe((res)=>{
-        this.AssessDates=res['Assessment-Dates']
-        console.log(this.AssessDates)
-        this.loadMetrics()
-      })
+    this.data.getAssessmentdates(this.label).subscribe((res)=>{
+      this.AssessDates=res['Assessment-Dates']
+      console.log(this.AssessDates)
+      this.loadMetrics()
+    })
 
 
     this.data.getFacets()
@@ -151,8 +167,8 @@ export class DetailsComponent implements OnInit {
             }
           }
         }
-    console.log(`category list ${this.CatList}`)
-    console.log(`dimensions list ${this.DimList}`)
+        console.log(`category list ${this.CatList}`)
+        console.log(`dimensions list ${this.DimList}`)
       })
     
   }
@@ -173,23 +189,23 @@ export class DetailsComponent implements OnInit {
           if(this.quality_metrics[i]['Metric-Label']==='Syntax Error')
             if(this.quality_metrics[i].Observations[0]['Value']==1) this.Syntax_boolean = true
 
-          console.log(this.quality_metrics[i].Observations[0]['Value-Type'])
-          if(this.quality_metrics[i].Observations[0]['Value-Type']==="Double")
-            this.quality_metrics[i].Observations[0]['Value']=this.quality_metrics[i].Observations[0]['Value']*100
+              console.log(this.quality_metrics[i].Observations[0]['Value-Type'])
+            if(this.quality_metrics[i].Observations[0]['Value-Type']==="Double")
+              this.quality_metrics[i].Observations[0]['Value']=this.quality_metrics[i].Observations[0]['Value']*100
 
-          if(this.quality_metrics[i].Observations[0]['Value-Type']==='Double') threshVal = 100
-            else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Integer') threshVal = 1000
-              else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Boolean') threshVal = 0
-                else threshVal = 0
+            if(this.quality_metrics[i].Observations[0]['Value-Type']==='Double') threshVal = 100
+              else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Integer') threshVal = 1000
+                else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Boolean') threshVal = 0
+                  else threshVal = 0
 
-          Object.defineProperty(this.quality_metrics[i],'weight',{
-              value: threshVal,
-              writable:true,
-              configurable:true
-            })
-        }
+                    Object.defineProperty(this.quality_metrics[i],'weight',{
+                      value: threshVal,
+                      writable:true,
+                      configurable:true
+                    })
+                }
 
-        console.log(this.quality_metrics)
+                console.log(this.quality_metrics)
 
         //Creating arrays for the different type of metrics
 
@@ -236,7 +252,7 @@ export class DetailsComponent implements OnInit {
 
       //Create Time Chart for all metrics
       this.createTimeChart()
-        
+
       this.data.getLODdata().subscribe((res)=>{
 
         this.lodDataService = res
@@ -249,149 +265,181 @@ export class DetailsComponent implements OnInit {
         let newDoubleLabels = []
         let LODdataDouble = []
         let missLOD = []
-        let found = false
 
-          this.DoubleMetrics.map((met)=>{
-            found = false
-            this.lodDataService.map((res)=>{
-              let name = res.name
-              if(name===met['Metric-Label']){
-                newDoubleLabels.push(met['Metric-Label'])
-                newDoubleData.push(met['Observations'][0].Value)
-                LODdataDouble.push(res.mean) 
-                found = true        
-              }
+        this.DoubleMetrics.map((met)=>{
+          this.lodDataService.map((res)=>{
+            let name = res.name
+            if(name===met['Metric-Label']){
+              newDoubleLabels.push(met['Metric-Label'])
+              newDoubleData.push(met['Observations'][0].Value)
+              LODdataDouble.push(res.mean)    
+            }
           })
-            if(!found) missLOD.push(met)
         })
 
-       console.log(LODdataDouble)
-       console.log(missLOD)
-       console.log(newDoubleData)
-       console.log(newDoubleLabels)
-       this.NotFoundLODData = missLOD
 
-      if(this.RadarCounter++==0)
-        this.loadRadar(newDoubleLabels,newDoubleData,LODdataDouble)
-      else this.addData(this.radarChart,newDoubleLabels,newDoubleData,LODdataDouble)
 
-      if(this.BarCounter++==0)
-        this.loadBar(newDoubleLabels,newDoubleData,LODdataDouble)
-      else this.addData(this.barChart,newDoubleLabels,newDoubleData,LODdataDouble)
-      })
+//Creating the Table Entry
+let tmp_Table:TableEntry[] = []
+        this.quality_metrics.map((res)=>{
+
+          let entry:TableEntry = {
+            'Metric-Label':'NA',
+            Value:-1,
+            LODAvg:-1,
+            'Date-Computed':'NA',
+            'Type':'NA',
+            'Percentage':-1
+          }
+          
+          entry['Metric-Label'] = res['Metric-Label']
+          entry['Value'] = res['Observations'][0]['Value']
+          entry['Date-Computed'] = res['Observations'][0]['Date-Computed']
+          entry['Type'] =  res['Observations'][0]['Value-Type']
+
+          let lodEntry = this.lodDataService.filter(lodMetric=> lodMetric.name===res['Metric-Label'])
+          try{
+            entry['LODAvg'] = lodEntry[0].mean
+            if(entry.Type=='Double')entry['Percentage'] = ((res['Observations'][0]['Value'] - lodEntry[0].mean)/lodEntry[0].mean)*100
+              else if(entry.Type=='Integer') entry['Percentage'] = (res['Observations'][0]['Value'] - lodEntry[0].mean)
+          }catch{
+            missLOD.push(res)
+          }
+          console.log(entry)
+          tmp_Table.push(entry)
+        })
+        console.log(tmp_Table)
+        this.Table = tmp_Table
+
+//Finished Creating Table array 
+
+        console.log(LODdataDouble)
+        console.log(missLOD)
+        console.log(newDoubleData)
+        console.log(newDoubleLabels)
+        this.NotFoundLODData = missLOD
+
+        if(this.RadarCounter++==0)
+          this.loadRadar(newDoubleLabels,newDoubleData,LODdataDouble)
+        else this.addData(this.radarChart,newDoubleLabels,newDoubleData,LODdataDouble)
+
+          if(this.BarCounter++==0)
+            this.loadBar(newDoubleLabels,newDoubleData,LODdataDouble)
+          else this.addData(this.barChart,newDoubleLabels,newDoubleData,LODdataDouble)
+        })
     })
-  }
+}
 
-  loadRadar(rlabels,rdata,loddata){
-              this.radarChart = new Chart('radar1',
-                {
-                  "type":"radar",
-                  "data":
-                    {
-                      "labels":rlabels,
-                      "datasets":[
-                        {
-                          "label":this.label,"data":rdata,
-                          "fill":true,"backgroundColor":"rgba(255, 99, 132, 0.2)",
-                          "borderColor":"rgb(255, 99, 132)",
-                          "pointBackgroundColor":"rgb(255, 99, 132)",
-                          "pointBorderColor":"#fff",
-                          "pointHoverBackgroundColor":"#fff",
-                          "pointHoverBorderColor":"rgb(255, 99, 132)"
-                        },
-                        {
-                          "label":"LOD Average Data",
-                          "data":loddata,
-                          "fill":true,
-                          "backgroundColor":"rgba(54, 162, 235, 0.2)",
-                          "borderColor":"rgb(54, 162, 235)",
-                          "pointBackgroundColor":"rgb(54, 162, 235)",
-                          "pointBorderColor":"#fff",
-                          "pointHoverBackgroundColor":"#fff",
-                          "pointHoverBorderColor":"rgb(54, 162, 235)"
-                        }]
-                     },
-                  "options":
-                    {
-                      "elements":
-                        {
-                          "line":
-                            {
-                              "tension":0,
-                               "borderWidth":3
-                            }
-                        }
-                    }
-              })
+loadRadar(rlabels,rdata,loddata){
+  this.radarChart = new Chart('radar1',
+  {
+    "type":"radar",
+    "data":
+    {
+      "labels":rlabels,
+      "datasets":[
+      {
+        "label":this.label,"data":rdata,
+        "fill":true,"backgroundColor":"rgba(255, 99, 132, 0.2)",
+        "borderColor":"rgb(255, 99, 132)",
+        "pointBackgroundColor":"rgb(255, 99, 132)",
+        "pointBorderColor":"#fff",
+        "pointHoverBackgroundColor":"#fff",
+        "pointHoverBorderColor":"rgb(255, 99, 132)"
+      },
+      {
+        "label":"LOD Average Data",
+        "data":loddata,
+        "fill":true,
+        "backgroundColor":"rgba(54, 162, 235, 0.2)",
+        "borderColor":"rgb(54, 162, 235)",
+        "pointBackgroundColor":"rgb(54, 162, 235)",
+        "pointBorderColor":"#fff",
+        "pointHoverBackgroundColor":"#fff",
+        "pointHoverBorderColor":"rgb(54, 162, 235)"
+      }]
+    },
+    "options":
+    {
+      "elements":
+      {
+        "line":
+        {
+          "tension":0,
+          "borderWidth":3
+        }
+      }
+    }
+  })
 
-  }
+}
 
-    loadBar(rlabels,rdata,loddata){
-              this.barChart = new Chart('bar1',
-                {
-                  "type":"bar",
-                  "data":
-                    {
-                      "labels":rlabels,
-                      "datasets":[
-                        {
-                          "label":this.label,"data":rdata,
-                          "fill":true,"backgroundColor":"rgba(255, 99, 132, 0.2)",
-                          "borderColor":"rgb(255, 99, 132)",
-                          "pointBackgroundColor":"rgb(255, 99, 132)",
-                          "pointBorderColor":"#fff",
-                          "pointHoverBackgroundColor":"#fff",
-                          "pointHoverBorderColor":"rgb(255, 99, 132)"
-                        },
+loadBar(rlabels,rdata,loddata){
+  this.barChart = new Chart('bar1',
+  {
+    "type":"bar",
+    "data":
+    {
+      "labels":rlabels,
+      "datasets":[
+      {
+        "label":this.label,"data":rdata,
+        "fill":true,"backgroundColor":"rgba(255, 99, 132, 0.2)",
+        "borderColor":"rgb(255, 99, 132)",
+        "pointBackgroundColor":"rgb(255, 99, 132)",
+        "pointBorderColor":"#fff",
+        "pointHoverBackgroundColor":"#fff",
+        "pointHoverBorderColor":"rgb(255, 99, 132)"
+      },
 
-                        {
-                          "label":"LOD Average Data",
-                          "data":loddata,
-                          "fill":true,
-                          "backgroundColor":"rgba(54, 162, 235, 0.2)",
-                          "borderColor":"rgb(54, 162, 235)",
-                          "pointBackgroundColor":"rgb(54, 162, 235)",
-                          "pointBorderColor":"#fff",
-                          "pointHoverBackgroundColor":"#fff",
-                          "pointHoverBorderColor":"rgb(54, 162, 235)"
-                        }]
-                     },
-                  "options":
-                    {
-                      "elements":
-                        {
-                          "line":
-                            {
-                              "tension":0,
-                               "borderWidth":3
-                            }
-                        },
-                        "scales": {
-                          "xAxes":[{
-                            "ticks": {
-                              "autoSkip":false
-                            }
-                          }]
-                        }
-                    }
-              })
-  }
+      {
+        "label":"LOD Average Data",
+        "data":loddata,
+        "fill":true,
+        "backgroundColor":"rgba(54, 162, 235, 0.2)",
+        "borderColor":"rgb(54, 162, 235)",
+        "pointBackgroundColor":"rgb(54, 162, 235)",
+        "pointBorderColor":"#fff",
+        "pointHoverBackgroundColor":"#fff",
+        "pointHoverBorderColor":"rgb(54, 162, 235)"
+      }]
+    },
+    "options":
+    {
+      "elements":
+      {
+        "line":
+        {
+          "tension":0,
+          "borderWidth":3
+        }
+      },
+      "scales": {
+        "xAxes":[{
+          "ticks": {
+            "autoSkip":false
+          }
+        }]
+      }
+    }
+  })
+}
 
-    openDialog(): void {
-    const dialogRef = this.dialog.open(MetricDialogComponent, {
-      width: '800px',
-      data: {metrics: this.quality_metrics}
-    });
+openDialog(): void {
+  const dialogRef = this.dialog.open(MetricDialogComponent, {
+    width: '800px',
+    data: {metrics: this.quality_metrics}
+  });
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      console.log(result)
-      if(result) this.quality_metrics = result;
-    });
-  }
+  dialogRef.afterClosed().subscribe(result => {
+    console.log('The dialog was closed');
+    console.log(result)
+    if(result) this.quality_metrics = result;
+  });
+}
 
-  newMetricProfile(label){
-    this.showProfilePage=true
+newMetricProfile(label){
+  this.showProfilePage=true
     //console.log(`Sending to child ${label}`)
     this.data.changeMetricName(label)
 
@@ -446,7 +494,7 @@ export class DetailsComponent implements OnInit {
 
   newDate(date){
     console.log(date)
-      this.data.MetricsForDated(this.label,date).subscribe(
+    this.data.MetricsForDated(this.label,date).subscribe(
       (data)=>{
         let threshVal = 0
         console.log(data)
@@ -454,69 +502,69 @@ export class DetailsComponent implements OnInit {
         
         for(let i in this.quality_metrics){
 
-            if(this.quality_metrics[i]['Metric-Label']==='Syntax Error')
-              if(this.quality_metrics[i].Observations[0]['Value']==1) this.Syntax_boolean = true
+          if(this.quality_metrics[i]['Metric-Label']==='Syntax Error')
+            if(this.quality_metrics[i].Observations[0]['Value']==1) this.Syntax_boolean = true
 
-          console.log(this.quality_metrics[i].Observations[0]['Value-Type'])
-          if(this.quality_metrics[i].Observations[0]['Value-Type']==="Double")
-            this.quality_metrics[i].Observations[0]['Value']=this.quality_metrics[i].Observations[0]['Value']*100
+              console.log(this.quality_metrics[i].Observations[0]['Value-Type'])
+            if(this.quality_metrics[i].Observations[0]['Value-Type']==="Double")
+              this.quality_metrics[i].Observations[0]['Value']=this.quality_metrics[i].Observations[0]['Value']*100
 
-          if(this.quality_metrics[i].Observations[0]['Value-Type']==='Double') threshVal = 100
-            else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Integer') threshVal = 1000
-              else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Boolean') threshVal = 0
-                else threshVal = 0
+            if(this.quality_metrics[i].Observations[0]['Value-Type']==='Double') threshVal = 100
+              else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Integer') threshVal = 1000
+                else if(this.quality_metrics[i].Observations[0]['Value-Type']==='Boolean') threshVal = 0
+                  else threshVal = 0
 
-          Object.defineProperty(this.quality_metrics[i],'weight',{
-              value: threshVal,
-              writable:true,
-              configurable:true
-            })
-        }
-        console.log(this.quality_metrics)
+                    Object.defineProperty(this.quality_metrics[i],'weight',{
+                      value: threshVal,
+                      writable:true,
+                      configurable:true
+                    })
+                }
+                console.log(this.quality_metrics)
 
-        this.DoubleMetrics = []
-        this.IntMetrics = []
-        this.BooleanMetrics = []
+                this.DoubleMetrics = []
+                this.IntMetrics = []
+                this.BooleanMetrics = []
 
-        this.quality_metrics.map((res)=>{
+                this.quality_metrics.map((res)=>{
 
-          let MetricType = res.Observations[0]['Value-Type']
-          if(MetricType==='Double'){
-            this.DoubleMetrics.push(res)
-          }
-          else if(MetricType==='Integer'){
-            this.IntMetrics.push(res)
-          }
-          else if(MetricType==='Boolean'){
-            this.BooleanMetrics.push(res)
-          }
-        })
+                  let MetricType = res.Observations[0]['Value-Type']
+                  if(MetricType==='Double'){
+                    this.DoubleMetrics.push(res)
+                  }
+                  else if(MetricType==='Integer'){
+                    this.IntMetrics.push(res)
+                  }
+                  else if(MetricType==='Boolean'){
+                    this.BooleanMetrics.push(res)
+                  }
+                })
 
-        console.log('Sectioning')
-        console.log(this.DoubleMetrics)
-        console.log(this.IntMetrics)
-        console.log(this.BooleanMetrics)
+                console.log('Sectioning')
+                console.log(this.DoubleMetrics)
+                console.log(this.IntMetrics)
+                console.log(this.BooleanMetrics)
 
-        let doubleLabels = this.DoubleMetrics.map(res=>res['Metric-Label'])
-        let doubleData = this.DoubleMetrics.map(res=>res.Observations[0]['Value'])
+                let doubleLabels = this.DoubleMetrics.map(res=>res['Metric-Label'])
+                let doubleData = this.DoubleMetrics.map(res=>res.Observations[0]['Value'])
 
-        console.log('Double Labels and Data')
-        console.log(doubleLabels)
-        console.log(doubleData)
+                console.log('Double Labels and Data')
+                console.log(doubleLabels)
+                console.log(doubleData)
 
-        this.rlabels1 = this.quality_metrics.map((res)=>{
-          return res['Metric-Label']
-        })
-        this.rdata1 = this.quality_metrics.map((res)=>{
-          console.log((res['Observations'][0]).Value)
-          if((res['Observations'][0]).Value<=100) return (res['Observations'][0]).Value
-          else return 50
-        })
+                this.rlabels1 = this.quality_metrics.map((res)=>{
+                  return res['Metric-Label']
+                })
+                this.rdata1 = this.quality_metrics.map((res)=>{
+                  console.log((res['Observations'][0]).Value)
+                  if((res['Observations'][0]).Value<=100) return (res['Observations'][0]).Value
+                    else return 50
+                  })
 
-        this.labelMetrics = this.rdata1
-        console.log(`rlabels: ${this.rlabels1.length} ${this.rlabels1}`)
-        console.log(`rdata: ${this.rdata1}`)
-        
+                this.labelMetrics = this.rdata1
+                console.log(`rlabels: ${this.rlabels1.length} ${this.rlabels1}`)
+                console.log(`rdata: ${this.rdata1}`)
+
         //Sorting Metrics in Ascending Order of Value
         this.quality_metrics.sort(function(a, b){
           var nameA=(a['Observations'][0]).Value, nameB=(b['Observations'][0]).Value
@@ -528,97 +576,125 @@ export class DetailsComponent implements OnInit {
         })
 
         
-      this.data.getLODdata().subscribe((res)=>{
+        this.data.getLODdata().subscribe((res)=>{
 
-        this.lodDataService = res
-        console.log(this.lodDataService)
-        this.doubleLOD = []
-        this.intLOD = []
-        this.boolLOD = []
-        let newDoubleData = []
-        let newDoubleLabels = []
-        let LODdataDouble = []
-        let missLOD = []
-        let found = false
+          this.lodDataService = res
+          console.log(this.lodDataService)
+          this.doubleLOD = []
+          this.intLOD = []
+          this.boolLOD = []
+          let newDoubleData = []
+          let newDoubleLabels = []
+          let LODdataDouble = []
+          let missLOD = []
 
           this.DoubleMetrics.map((met)=>{
-            found = false
             this.lodDataService.map((res)=>{
               let name = res.name
               if(name===met['Metric-Label']){
                 newDoubleLabels.push(met['Metric-Label'])
                 newDoubleData.push(met['Observations'][0].Value)
-                LODdataDouble.push(res.mean) 
-                found = true        
+                LODdataDouble.push(res.mean)     
               }
+            })
           })
-            if(!found) missLOD.push(met)
+
+          //Creating the Table Entry
+        let tmp_Table:TableEntry[] = []
+        this.quality_metrics.map((res)=>{
+          let entry:TableEntry = {
+            'Metric-Label':'NA',
+            Value:-1,
+            LODAvg:-1,
+            'Date-Computed':'NA',
+            'Type':'NA',
+            'Percentage':-1
+          }
+          
+          entry['Metric-Label'] = res['Metric-Label']
+          entry['Value'] = res['Observations'][0]['Value']
+          entry['Date-Computed'] = res['Observations'][0]['Date-Computed']
+          entry['Type'] =  res['Observations'][0]['Value-Type']
+          let lodEntry = this.lodDataService.filter(lodMetric=> lodMetric.name===res['Metric-Label'])
+          try{
+            entry['LODAvg'] = lodEntry[0].mean
+            if(entry.Type=='Double')entry['Percentage'] = ((res['Observations'][0]['Value'] - lodEntry[0].mean)/lodEntry[0].mean)*100
+              else if(entry.Type=='Integer') entry['Percentage'] = (res['Observations'][0]['Value'] - lodEntry[0].mean)
+          }catch{
+            missLOD.push(res)
+          }
+          console.log(entry)
+          tmp_Table.push(entry)
         })
+        console.log(tmp_Table)
+        this.Table = tmp_Table
 
-       console.log(LODdataDouble)
-       console.log(missLOD)
-       console.log(newDoubleData)
-       console.log(newDoubleLabels)
-       this.NotFoundLODData = missLOD
+//Finished Creating Table array 
 
-      if(this.RadarCounter++==0)
-        this.loadRadar(newDoubleLabels,newDoubleData,LODdataDouble)
-      else this.addData(this.radarChart,newDoubleLabels,newDoubleData,LODdataDouble)
+          console.log(LODdataDouble)
+          console.log(missLOD)
+          console.log(newDoubleData)
+          console.log(newDoubleLabels)
+          this.NotFoundLODData = missLOD
 
-      if(this.BarCounter++==0)
-        this.loadBar(newDoubleLabels,newDoubleData,LODdataDouble)
-      else this.addData(this.barChart,newDoubleLabels,newDoubleData,LODdataDouble)
+          if(this.RadarCounter++==0)
+            this.loadRadar(newDoubleLabels,newDoubleData,LODdataDouble)
+          else this.addData(this.radarChart,newDoubleLabels,newDoubleData,LODdataDouble)
+
+            if(this.BarCounter++==0)
+              this.loadBar(newDoubleLabels,newDoubleData,LODdataDouble)
+            else this.addData(this.barChart,newDoubleLabels,newDoubleData,LODdataDouble)
+          })
       })
-    })
-  }
-
-   addData(chart, labels, data,LOD_Data) {
-     try{
-      chart.data.labels=labels;
-      chart.data.datasets[0].data=data
-      chart.data.datasets[1].data=LOD_Data
-      chart.update();
-    }catch(err){
-      console.log(err)
-    }
-  }
-
-    precise(x) {
-    return Number.parseFloat(x).toFixed(2);
 }
 
-  boolValue(val){
-    if(val==1) return 'true'
-      else return 'false'
+addData(chart, labels, data,LOD_Data) {
+  try{
+    chart.data.labels=labels;
+    chart.data.datasets[0].data=data
+    chart.data.datasets[1].data=LOD_Data
+    chart.update();
+  }catch(err){
+    console.log(err)
+  }
+}
+
+precise(x) {
+  return Number.parseFloat(x).toFixed(2);
+}
+
+boolValue(val){
+  if(val==1) return 'true'
+    else return 'false'
   }
 
 booleanBar(currentVal,threshVal){
   if(currentVal===threshVal) return 100
     else return 0
-}
+  }
 
- exists(label) {
-   try {
-     let arr = this.CategoriesF.value.filter(res => res == label)
-     if (arr.length > 0) return false
-     else return true
-   } catch (err) {
+exists(label) {
+  try {
+    let arr = this.CategoriesF.value.filter(res => res == label)
+    if (arr.length > 0) return false
+      else return true
+    } catch (err) {
      //console.log(err)
      return false
    }
  }
 
-SelectedCatF(){
-  try{
-      if(this.CategoriesF!=undefined){
-        if(this.CategoriesF.value.length>0)
-          return false
-        else return true
-      }
-      else return false
-  } catch {
-      return false
-  }
+ SelectedCatF(){
+   try{
+     if(this.CategoriesF!=undefined){
+       if(this.CategoriesF.value.length>0)
+         return false
+       else return true
+     }
+   else return false
+ } catch {
+   return false
+ }
 
 }
 
@@ -643,9 +719,9 @@ createTimeChart(){
   this.DoubleMetrics.map((res)=>{
     var tmp: TimeGraphData = {
       label:res['Metric-Label'],
-        borderColor:this.getRandomColor(),
-        fill: false,
-        data: []
+      borderColor:this.getRandomColor(),
+      fill: false,
+      data: []
     }
 
     datasetsTime.push(tmp)
@@ -675,52 +751,110 @@ DatesCall(TimeSets,r){
         }
       })
     })
-     r+=1
-     if(r<this.AssessDates.length) this.DatesCall(TimeSets,r)
-       else if(r==this.AssessDates.length){
-          console.log(TimeSets)
-          this.createTimeGraph(TimeSets)
-       }
-  })
-
-}
-
-createTimeGraph(TimeData){
-      this.TimeChart = new Chart('timeChart',{
-
-      type: 'line',
-      data: {
-        labels: this.AssessDates,
-        datasets: TimeData
-      },
-      options: {
-        scaleShowvalues:true,
-        legend: {
-          display: true
-        },
-scales: {
-          xAxes: [{
-            scaleLabel: {
-              display: true,
-              labelString: 'Date'
-            }
-          }],
-          yAxes: [{
-            scaleLabel: {
-              display: true,
-              labelString: 'value'
-            }
-          }]
-        }
+    r+=1
+    if(r<this.AssessDates.length) this.DatesCall(TimeSets,r)
+      else if(r==this.AssessDates.length){
+        console.log(TimeSets)
+        this.createTimeGraph(TimeSets)
       }
     })
 
 }
 
+createTimeGraph(TimeData){
+  this.TimeChart = new Chart('timeChart',{
+
+    type: 'line',
+    data: {
+      labels: this.AssessDates,
+      datasets: TimeData
+    },
+    options: {
+      scaleShowvalues:true,
+      legend: {
+        display: true
+      },
+      scales: {
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Date'
+          }
+        }],
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'value'
+          }
+        }]
+      }
+    }
+  })
 
 }
 
+  sortData(sort) {
+    const data = this.Table.slice();
+    if (!sort.active || sort.direction === '') {
+      this.sortedData = data;
+      return;
+    }
 
+    this.sortedData = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      switch (sort.active) {
+        case 'Metric-Label': return compare(a['Metric-Label'], b['Metric-Label'], isAsc);
+        case 'Value': return compare(a.Value, b.Value, isAsc);
+        case 'LODAvg': return compare(a.LODAvg, b.LODAvg, isAsc);
+        case 'Percentage': return compare(a.Percentage, b.Percentage, isAsc);
+        case 'Type': return compare(a.Type, b.Type, isAsc);
+        case 'Date-Computed': return compare(a['Date-Computed'], b['Date-Computed'], isAsc);
+        default: return 0;
+      }
+    });
+  }
+
+
+  getValue(val:number){
+    if(val==-1) return 'NA'
+      else return val
+  }
+
+ getStyle(entry){
+   if(entry.Type==='Boolean'){
+     if(entry.Value==false)
+     return 'red'
+     else return 'green'
+   }
+ }
+
+ getPercentage(entry:TableEntry){
+   if(entry.Type=='Double' && entry.LODAvg>=0){
+     if(entry.Percentage<0) return ((entry.Percentage).toFixed(2)+' %')
+       else if(entry.Percentage>0) return ((entry.Percentage).toFixed(2)+' %')
+         else if(entry.Percentage==0) return 'Equal'
+  }
+  if(entry.Type=='Integer' && entry.LODAvg>=0){
+    if(entry.Percentage<0) return (entry.Percentage).toFixed(2)
+      else if(entry.Percentage>0) return (entry.Percentage).toFixed(2)
+        else if(entry.Percentage==0) return 'Equal'
+  }
+  else return '-'
+ }
+
+getPercentStyle(entry:TableEntry){
+   if(entry.Type==='Double' || entry.Type==='Integer'){
+     if(entry.Percentage<0) return 'red'
+     else if(entry.Percentage>=0) return 'green'
+   }
+}
+
+}
+
+//Function outside constructo, prevents use of this.compare to use function
+function compare(a, b, isAsc) {
+  return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+}
 
 
 
