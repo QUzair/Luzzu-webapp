@@ -6,9 +6,9 @@
 		<ul>
 			<li>
 				<mat-form-field class="example-full-width">
-			  		<mat-select placeholder="Datasets" [(formControl)]="datasetsForm" multiple>
-			    		<mat-option class="selecto" *ngFor="let topping of users$" [value]="topping">{{topping['Dataset-PLD']}}</mat-option>
-			  		</mat-select>
+					<mat-select placeholder="Datasets" [(formControl)]="datasetsForm" multiple>
+						<mat-option class="selecto" *ngFor="let topping of users$" [value]="topping">{{topping['Dataset-PLD']}}</mat-option>
+					</mat-select>
 				</mat-form-field>
 				<ul *ngFor="let d of datasetsForm.value">
 					<li>
@@ -23,14 +23,16 @@
 		<ul>
 			<li>
 				<mat-form-field class="example-full-width">
-			  		<mat-select placeholder="Metrics" [(formControl)]="metricsForm" multiple>
-			    		<mat-option *ngFor="let metric of metricURIs" [value]="metric">{{metric.Label}}
-			    		</mat-option>
-			  		</mat-select>
+					<mat-select placeholder="Metrics" [(formControl)]="metricsForm" multiple>
+						<mat-option *ngFor="let metric of MetricsOptions" [value]="metric">{{metric.Label}}
+						</mat-option>
+					</mat-select>
 				</mat-form-field>
 				<ul *ngFor="let m of metricsForm.value">
 					<li>
-						{{m.Label}}
+						<strong>{{m.Label}}</strong>
+						<br>
+						<mat-hint>{{m.Comment}}</mat-hint>
 					</li>
 				</ul>
 			</li>
@@ -39,7 +41,7 @@
 
 	<div class="column3">
 		<ul>
-				<button (click)="Visualise()" mat-fab color="primary" style="float: left;">Visualise</button>
+			<button (click)="Visualise()" mat-fab color="primary">Visualise</button>
 		</ul>
 	</div>
 
@@ -48,10 +50,20 @@
 
 <ul>
 	<li>
+		<div *ngFor="let dataset of NA_Dataset_Metrics">
+			{{dataset['Dataset-Label']}}
+			<div *ngFor="let metric of dataset.Metrics">
+				<li>
+					{{metric}}
+				</li>
+			</div>
+		</div>
+	</li>
+	<li>
 		<h3>Radar Graph</h3>
 	</li>
 	<li>
-			<div *ngIf="radarChartm">
+		<div *ngIf="radarChartm">
 			<canvas id="radar1">{{radarChartm}}</canvas>
 		</div>
 	</li>
@@ -63,5 +75,24 @@
 			<canvas id="bar1">{{barChartm}}</canvas>
 		</div>
 	</li>
+	<div *ngIf="showTable">
+		<li>
+			<table matSort (matSortChange)="sortData($event)">
+				<tr>
+					<th mat-sort-header="Dataset-Label">Dataset Label</th>
+					<th  *ngFor="let metric of sortedData[0].Metrics" mat-sort-header={{metric.Label}}>
+						{{metric.Label}}
+					</th>
+				</tr>
+
+				<tr *ngFor="let entry of sortedData">
+					<td>{{entry['Dataset-Label']}}</td>
+					<td *ngFor="let metric of entry.Metrics">
+						{{metric.LatestValue}}
+					</td>
+				</tr>
+			</table>
+		</li>
+	</div>
 </ul>
 

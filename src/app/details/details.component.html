@@ -16,24 +16,28 @@
 
 		<div class="Download-box">  
 			<div style="display: inline-block;">
-				<button mat-flat-button color="primary" matTooltip="Download Quality Metadata in RDF Format" class="buttons">
+				<button mat-flat-button color="primary" matTooltip="Download Quality Metadata in RDF Format based on daQ" class="buttons">
 					<i class="material-icons">
 						save_alt
 					</i>
 					RDF Quality Metadata
 				</button>
+				<a href="http://purl.org/eis/vocab/daq" target="_blank" matTooltip="Click to be redirected to daQ Ontology" matTooltipPosition='after'
+					[matTooltipHideDelay]=2000>
+					<span><i class="material-icons">info</i></span>
+				</a>
 			</div>
 			<div style="display: inline-block;">
-				<button mat-stroked-button color="primary" >
+				<button mat-stroked-button color="primary" matTooltip="Inconsistencies may exist as Luzzu by default, creates metadata based on dqv" class="buttons">
 					<i class="material-icons">
 						save_alt
 					</i>
 					W3C DQV Metadata
 				</button>
-				<a href="http://purl.org/eis/vocab/daq" target="_blank" matTooltip="Inconsistencies may exist as Luzzu by default, creates metadata based on daQ [Click to be directed to Ontology]" matTooltipPosition='after'
-				[matTooltipHideDelay]=2000>
-				<span><i class="material-icons">info</i></span>
-			</a>
+				<a href="https://www.w3.org/TR/vocab-dqv/" target="_blank" matTooltip="Click to be directed to dqV Ontology" matTooltipPosition='after'
+					[matTooltipHideDelay]=2000>
+					<span><i class="material-icons">info</i></span>
+				</a>
 		</div>
 	</div>
 </li>
@@ -81,7 +85,7 @@
 				</li>
 				<div *ngIf="NotFoundLODData.length>0">
 					<li>
-						<mat-error>LOD data ßnot available for: </mat-error>
+						<mat-error>LOD data not available for: </mat-error>
 						<div *ngFor="let notFound of NotFoundLODData" class="list">
 							{{notFound['Metric-Label']}}
 						</div>
@@ -89,7 +93,7 @@
 				</div>
 				<div *ngIf="(ChoicesGroup.value=='Table')">
 					<li>
-						<table  matSort (matSortChange)="sortData($event)">
+						<table matSort (matSortChange)="sortData($event)">
 						  <tr>
 						    <th mat-sort-header="Metric-Label">Metric Label</th>
 						    <th mat-sort-header="Value">Value</th>
@@ -101,13 +105,14 @@
 
 						  <tr *ngFor="let Tablemetric of sortedData">
 						    <td>{{Tablemetric['Metric-Label']}}</td>
-						    <td [style.color]="getStyle(Tablemetric)">{{Tablemetric['Value']}}</td>
+						    <td [style.color]="getStyle(Tablemetric)">{{(Tablemetric['Value'])}}</td>
 						    <td>{{getValue(Tablemetric['LODAvg'])}}</td>
 						    <td [style.color]="getPercentStyle(Tablemetric)">{{getPercentage(Tablemetric)}}</td>
 						    <td>{{Tablemetric['Type']}}</td>
 						    <td>{{Tablemetric['Date-Computed']}}</td>
 						  </tr>
 						</table>
+						<br>
 					</li>
 				</div>
 			</ul>

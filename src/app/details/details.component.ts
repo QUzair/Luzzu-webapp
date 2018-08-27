@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
 import { DataService } from '../data.service';
 import { VDataService } from '../v-data.service'
 import { Observable } from 'rxjs';
@@ -8,10 +8,10 @@ import { MaterialModule } from '../material.module';
 import { FormsModule, Validators} from '@angular/forms'
 import 'hammerjs';
 import { Chart } from 'chart.js';
-import {MatAutocompleteModule} from '@angular/material/autocomplete';
-import {FormControl} from '@angular/forms';
-import {map, startWith} from 'rxjs/operators';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { FormControl } from '@angular/forms';
+import { map, startWith } from 'rxjs/operators';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { MetricDialogComponent } from '../metric-dialog/metric-dialog.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -58,8 +58,9 @@ export class DetailsComponent implements OnInit {
   DatasetURL:string
   Dimen: string[] = ['Categories', 'Dimensions', 'Metrics'];
 
-  Table: TableEntry[] = []
-  sortedData: TableEntry[]
+  Table: TableEntry[] = [{'Metric-Label': "Ontology hijacking metric", Value: 1.6513225193628522, LODAvg: 93.64, 'Date-Computed': "2018-08-09", 'Type': "Double",Percentage:0}]
+  sortedData: TableEntry[] = []
+
 
   CategoriesF = new FormControl('',[
     Validators.required
@@ -67,8 +68,6 @@ export class DetailsComponent implements OnInit {
   DimensionsF = new FormControl('',[
     Validators.required
     ]);
-
-
 
   double_minForm = new FormControl('', [
     Validators.required
@@ -82,6 +81,7 @@ export class DetailsComponent implements OnInit {
   int_maxForm = new FormControl('', [
     Validators.required
     ]);
+
 
   ShowBooleansVal = false
   ShowThresholds = false
@@ -134,12 +134,9 @@ export class DetailsComponent implements OnInit {
       this.label = decodeURIComponent(params.id)
       this.data.changeLabel(this.label)
     })
-
-    this.sortedData = this.Table.slice()
   }
 
   ngOnInit() {
-
     this.data.CurrentMetric.subscribe((res)=> {
       console.log(res)
       this.msg = res
@@ -310,7 +307,7 @@ let tmp_Table:TableEntry[] = []
         })
         console.log(tmp_Table)
         this.Table = tmp_Table
-
+        this.sortedData = this.Table.slice()
 //Finished Creating Table array 
 
         console.log(LODdataDouble)
@@ -628,6 +625,7 @@ newMetricProfile(label){
         })
         console.log(tmp_Table)
         this.Table = tmp_Table
+        //this.sortData(Event)
 
 //Finished Creating Table array 
 
@@ -814,7 +812,6 @@ createTimeGraph(TimeData){
     });
   }
 
-
   getValue(val:number){
     if(val==-1) return 'NA'
       else return val
@@ -823,8 +820,8 @@ createTimeGraph(TimeData){
  getStyle(entry){
    if(entry.Type==='Boolean'){
      if(entry.Value==false)
-     return 'red'
-     else return 'green'
+     return '#dd4a4a'
+     else return '#70bd79'
    }
  }
 
@@ -844,14 +841,14 @@ createTimeGraph(TimeData){
 
 getPercentStyle(entry:TableEntry){
    if(entry.Type==='Double' || entry.Type==='Integer'){
-     if(entry.Percentage<0) return 'red'
-     else if(entry.Percentage>=0) return 'green'
+     if(entry.Percentage<0) return '#dd4a4a'
+     else if(entry.Percentage>=0) return '#70bd79'
    }
 }
 
 }
 
-//Function outside constructo, prevents use of this.compare to use function
+//Function outside constructor, prevents use of this.compare to use function
 function compare(a, b, isAsc) {
   return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
 }
