@@ -2,6 +2,11 @@
 <ul>
 	<li><h2>{{label}}</h2></li>
 	<li>
+		<div *ngIf="Count_Value>0">
+			<h3>Number of Triples</h3>
+			{{Count_Value}}
+		</div>
+
 		<h3>Assessment Dates</h3>
 		<mat-button-toggle-group #group="matButtonToggleGroup" vertical value='Latest'>
 			<mat-button-toggle (click)="loadMetrics()" value='Latest'>

@@ -90,7 +90,7 @@ export class DetailsComponent implements OnInit {
   RadarCounter = 0
   BarCounter = 0 
 
-
+  Count_Value:number = 0
   DoubleMetrics = []
   IntMetrics = []
   BooleanMetrics = []
@@ -182,8 +182,8 @@ export class DetailsComponent implements OnInit {
         //Adding Threshold Weights
         //Converting value of double to percentage 
         for(let i in this.quality_metrics){
-
-          if(this.quality_metrics[i]['Metric-Label']==='Syntax Error')
+          if(this.quality_metrics[i]['Metric-Label']==='Count Metric') this.Count_Value = this.quality_metrics[i].Observations[0]['Value']
+          else if(this.quality_metrics[i]['Metric-Label']==='Syntax Error')
             if(this.quality_metrics[i].Observations[0]['Value']==1) this.Syntax_boolean = true
 
               console.log(this.quality_metrics[i].Observations[0]['Value-Type'])
