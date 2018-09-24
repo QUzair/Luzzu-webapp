@@ -1,6 +1,8 @@
 <h1>Dataset Quality Metadata Dashboard</h1>
 <ul>
-	<li><h2>{{label}}</h2></li>
+	<li>
+		<h2>{{label}}</h2>
+	</li>
 	<li>
 		<div *ngIf="Count_Value>0">
 			<h3>Number of Triples</h3>
@@ -16,44 +18,48 @@
 				{{date}}
 			</mat-button-toggle>
 		</mat-button-toggle-group>
-		<div class="selected-value"><strong>Showing Date:</strong></div><div class="selected-value"> {{group.value}} </div>
+		<div class="selected-value"><strong>Showing Date:</strong></div>
+		<div class="selected-value"> {{group.value}} </div>
 		<mat-error *ngIf="Syntax_boolean">Data has Syntax Errors and is unable to be assessed over any other Metrics</mat-error>
 
-		<div class="Download-box">  
+		<!--Dataset Downlaod Options-->
+		<div class="Download-box">
 			<div style="display: inline-block;">
-				<button mat-flat-button color="primary" matTooltip="Download Quality Metadata in RDF Format based on daQ" class="buttons">
+				<button (click)="getDAQMetadata()" mat-flat-button color="primary" matTooltip="Download Quality Metadata in RDF Format based on daQ"
+				 class="buttons">
 					<i class="material-icons">
 						save_alt
 					</i>
 					RDF Quality Metadata
 				</button>
-				<a href="http://purl.org/eis/vocab/daq" target="_blank" matTooltip="Click to be redirected to daQ Ontology" matTooltipPosition='after'
-					[matTooltipHideDelay]=2000>
+				<a href="http://purl.org/eis/vocab/daq" target="_blank" matTooltip="Click to be redirected to daQ Ontology"
+				 matTooltipPosition='after' [matTooltipHideDelay]=2000>
 					<span><i class="material-icons">info</i></span>
 				</a>
 			</div>
 			<div style="display: inline-block;">
-				<button mat-stroked-button color="primary" matTooltip="Inconsistencies may exist as Luzzu by default, creates metadata based on dqv" class="buttons">
+				<button (click)="getDQVMetadata()" mat-stroked-button color="primary" matTooltip="Inconsistencies may exist as Luzzu by default, creates metadata based on dqv"
+				 class="buttons">
 					<i class="material-icons">
 						save_alt
 					</i>
 					W3C DQV Metadata
 				</button>
-				<a href="https://www.w3.org/TR/vocab-dqv/" target="_blank" matTooltip="Click to be directed to dqV Ontology" matTooltipPosition='after'
-					[matTooltipHideDelay]=2000>
+				<a href="https://www.w3.org/TR/vocab-dqv/" target="_blank" matTooltip="Click to be directed to dqV Ontology"
+				 matTooltipPosition='after' [matTooltipHideDelay]=2000>
 					<span><i class="material-icons">info</i></span>
 				</a>
+			</div>
 		</div>
-	</div>
-</li>
+	</li>
 </ul>
-<div [hidden]="Syntax_boolean">	
-
-
+<!--IF Syntax Error exists Anything below wont show-->
+<div [hidden]="Syntax_boolean">
 	<mat-tab-group>
-		<mat-tab label="Quality Metadata Visualisation"> 
+		<mat-tab label="Quality Metadata Visualisation">
 			<ul>
 				<li>
+					<!--Toggle For Data Viewing Option-->
 					<div class="VisChoices">
 						<mat-button-toggle-group #ChoicesGroup="matButtonToggleGroup" value="Radar">
 							<mat-button-toggle *ngFor="let visType of VisChoices" (click)="newChoice(visType)" value={{visType}}>
@@ -62,9 +68,11 @@
 						</mat-button-toggle-group>
 					</div>
 				</li>
+				<!--Hid Element if it isnt chosen in Multi-Selection Radio Button-->
 				<li [hidden]="!(ChoicesGroup.value=='Radar')">
 					<h3>Radar Chart</h3>
-					<p>This chart presents an areal Visualisation of the Quality Metrics compared to the Linked Open Datasets Metrics  assessed by Luzzu</p>
+					<p>This chart presents an areal Visualisation of the Quality Metrics compared to the Linked Open Datasets Metrics
+						assessed by Luzzu</p>
 					<div *ngIf="radarChart" class="VisChoices">
 						<canvas id="radar1">{{radarChart}}</canvas>
 					</div>
@@ -72,10 +80,11 @@
 				<div [hidden]="!(ChoicesGroup.value=='Bar')">
 					<li>
 						<h3>Bar Chart</h3>
-						<p>The Bar Graph Provides a side by side representation of the quality metrics agaisnt the Linked Open Datasets Metrics assessed by Luzzu</p>
+						<p>The Bar Graph Provides a side by side representation of the quality metrics agaisnt the Linked Open Datasets
+							Metrics assessed by Luzzu</p>
 					</li>
 					<li>
-						<div *ngIf="barChart" >
+						<div *ngIf="barChart">
 							<canvas id="bar1">{{barChart}}</canvas>
 						</div>
 					</li>
@@ -84,8 +93,8 @@
 				<li [hidden]="!(ChoicesGroup.value=='Line')">
 					<h3>Line Chart</h3>
 					<p>The Time Graph shows the progress of all the quality metrics (Doubles) for {{label}} over time</p>
-					<div *ngIf="TimeChart" >
-						<canvas id="timeChart" >{{TimeChart}}</canvas>
+					<div *ngIf="TimeChart">
+						<canvas id="timeChart">{{TimeChart}}</canvas>
 					</div>
 				</li>
 				<div *ngIf="NotFoundLODData.length>0">
@@ -99,38 +108,39 @@
 				<div *ngIf="(ChoicesGroup.value=='Table')">
 					<li>
 						<table matSort (matSortChange)="sortData($event)">
-						  <tr>
-						    <th mat-sort-header="Metric-Label">Metric Label</th>
-						    <th mat-sort-header="Value">Value</th>
-						    <th mat-sort-header="LODAvg">LOD Average</th>
-						    <th mat-sort-header="Percentage">% Difference (Val/LOD)</th>
-						    <th mat-sort-header="Type">Value Type</th>
-						    <th mat-sort-header="Date-Computed">Date Computed</th>
-						  </tr>
+							<tr>
+								<th mat-sort-header="Metric-Label">Metric Label</th>
+								<th mat-sort-header="Value">Value</th>
+								<th mat-sort-header="LODAvg">LOD Average</th>
+								<th mat-sort-header="Percentage">% Difference (Val/LOD)</th>
+								<th mat-sort-header="Type">Value Type</th>
+								<th mat-sort-header="Date-Computed">Date Computed</th>
+							</tr>
 
-						  <tr *ngFor="let Tablemetric of sortedData">
-						    <td>{{Tablemetric['Metric-Label']}}</td>
-						    <td [style.color]="getStyle(Tablemetric)">{{(Tablemetric['Value'])}}</td>
-						    <td>{{getValue(Tablemetric['LODAvg'])}}</td>
-						    <td [style.color]="getPercentStyle(Tablemetric)">{{getPercentage(Tablemetric)}}</td>
-						    <td>{{Tablemetric['Type']}}</td>
-						    <td>{{Tablemetric['Date-Computed']}}</td>
-						  </tr>
+							<tr *ngFor="let Tablemetric of sortedData">
+								<td>{{Tablemetric['Metric-Label']}}</td>
+								<td [style.color]="getStyle(Tablemetric)">{{(Tablemetric['Value'])}}</td>
+								<td>{{getValue(Tablemetric['LODAvg'])}}</td>
+								<td [style.color]="getPercentStyle(Tablemetric)">{{getPercentage(Tablemetric)}}</td>
+								<td>{{Tablemetric['Type']}}</td>
+								<td>{{Tablemetric['Date-Computed']}}</td>
+							</tr>
 						</table>
 						<br>
 					</li>
 				</div>
 			</ul>
 		</mat-tab>
-
-		<mat-tab label="Metrics"> 
+		<!--Tab that contains the Metric Profile View-->
+		<mat-tab label="Metrics">
 			<ng-template matTabContent>
-				<ul>	
+				<ul>
+					<!--Provide Option for Filtering or Showing Thresholds-->
 					<li>
 						<mat-slide-toggle [(ngModel)]="ShowThresholds">
 							Thresholds
 						</mat-slide-toggle>
-					</li>				
+					</li>
 					<li>
 						<mat-slide-toggle [(ngModel)]="filterMetrics">
 							Filter
@@ -154,7 +164,7 @@
 								</mat-form-field>
 								<br>
 								<mat-form-field>
-									<mat-select placeholder="Dimensions"  [formControl]="DimensionsF" multiple>
+									<mat-select placeholder="Dimensions" [formControl]="DimensionsF" multiple>
 										<mat-optgroup *ngFor="let group of posts$" [label]="group.Label" [disabled]="exists(group.Label)">
 											<mat-option *ngFor="let dimen of group.Dimensions" [value]="dimen.Label">
 												{{dimen.Label}}
@@ -217,102 +227,111 @@
 
 
 							<mat-divider></mat-divider>
+							<div (click)="filter()"><i class="material-icons">filter_list</i> <button mat-button [disabled]="(double_maxForm.value-double_minForm.value)<0 || double_minForm.hasError('required')">Filter</button></div>
+						</mat-expansion-panel>
+					</div>
+					<mat-divider></mat-divider>
 
-							<div (click)="filter()"><i class="material-icons">filter_list</i>	<button mat-button [disabled]="(double_maxForm.value-double_minForm.value)<0 || double_minForm.hasError('required')">Filter</button></div>
-							</mat-expansion-panel>
-						</div>
-						<mat-divider></mat-divider>
-
-					</ul>
-					<div class="Container">
-						<div class="Left">
-							<ul>		
-								<div *ngIf="ShowThresholds"><li (click)="openDialog()"><i class="material-icons">settings_applications</i>	<button mat-button>Configure Metric Thresholds</button></li></div>
-								<div *ngIf="ShowThresholds"><li><h3>Current Value<br><font color="#A1C181">Threshold Value</font></h3></li></div>
-								<div *ngIf="!filterMetrics">
-									<div  *ngFor="let metric of quality_metrics; let i=index">
-										<div id="mydiv" style="background:white" onmouseover="this.style.background='gray';" onmouseout="this.style.background='white';">
-											<li (click)="newMetricProfile(metric)">
-												{{metric['Metric-Label']}}
-												<h5>
-													<div *ngIf="metric['Observations'][0]['Value-Type']==='Double'">
-														<div style="float:right;" *ngIf="!ShowThresholds">{{precise(metric['Observations'][0].Value)}} % </div>
-														<div *ngIf="ShowThresholds">
-															<div style="float:left;"> {{precise(metric['Observations'][0].Value)}} %  </div>
-															<div class="ThresholdText">{{precise(metric.weight)}} %</div>
-															<mat-progress-bar class="progress-bar" mode="determinate" [value]="(quality_metrics[i]['Observations'][0].Value/quality_metrics[i].weight)*100"></mat-progress-bar>
-														</div>
-													</div>   
-													<div *ngIf="metric['Observations'][0]['Value-Type']==='Boolean'">
-														<div style="float:right;" *ngIf="!ShowThresholds">{{boolValue(metric['Observations'][0].Value)}}</div>
-														<div *ngIf="ShowThresholds">
-															<div style="float:left;"> {{boolValue(metric['Observations'][0].Value)}} </div>
-															<div class="ThresholdText">{{boolValue(metric.weight)}}</div>
-															<mat-progress-bar class="progress-bar" mode="determinate" [value]="booleanBar(quality_metrics[i]['Observations'][0].Value,quality_metrics[i].weight)"></mat-progress-bar>
-														</div>
-													</div> 
-													<div *ngIf="metric['Observations'][0]['Value-Type']==='Integer'">
-														<div style="float:right;" *ngIf="!ShowThresholds">{{metric['Observations'][0].Value}}</div>
-														<div *ngIf="ShowThresholds">
-															<div style="float:left;"> {{metric['Observations'][0].Value}} </div>
-															<div class="ThresholdText">{{metric.weight}}</div>
-															<mat-progress-bar class="progress-bar" mode="determinate" [value]="(quality_metrics[i]['Observations'][0].Value/quality_metrics[i].weight)*100"></mat-progress-bar>
-														</div>
-													</div>  
-												</h5>
-											</li>
-										</div>
-									</div>
-								</div>
-
-								<div *ngIf="filterMetrics">
-									<div  *ngFor="let Fmetric of Filteredmetrics; let s=index">
-										<li (click)="newMetricProfile(Fmetric)">
-											{{Fmetric['Metric-Label']}}
+				</ul>
+				<div class="Container">
+					<div class="Left">
+						<ul>
+							<div *ngIf="ShowThresholds">
+								<li (click)="openDialog()"><i class="material-icons">settings_applications</i> <button mat-button>Configure
+										Metric Thresholds</button></li>
+							</div>
+							<div *ngIf="ShowThresholds">
+								<li>
+									<h3>Current Value<br>
+										<font color="#A1C181">Threshold Value</font>
+									</h3>
+								</li>
+							</div>
+							<div *ngIf="!filterMetrics">
+								<div *ngFor="let metric of quality_metrics; let i=index">
+									<div id="mydiv" style="background:white" onmouseover="this.style.background='gray';" onmouseout="this.style.background='white';">
+										<li (click)="newMetricProfile(metric)">
+											{{metric['Metric-Label']}}
 											<h5>
-												<div *ngIf="Fmetric['Observations'][0]['Value-Type']==='Double'">
-													<div style="float:right;" *ngIf="!ShowThresholds">{{precise(Fmetric['Observations'][0].Value)}} % </div>
+												<div *ngIf="metric['Observations'][0]['Value-Type']==='Double'">
+													<div style="float:right;" *ngIf="!ShowThresholds">{{precise(metric['Observations'][0].Value)}} % </div>
 													<div *ngIf="ShowThresholds">
-														<div style="float:left;"> {{precise(Fmetric['Observations'][0].Value)}} %  </div>
-														<div class="ThresholdText">{{precise(Fmetric.weight)}} %</div>
-														<mat-progress-bar class="progress-bar" mode="determinate" [value]="(Fmetric['Observations'][0].Value/Fmetric.weight)*100"></mat-progress-bar>
+														<div style="float:left;"> {{precise(metric['Observations'][0].Value)}} % </div>
+														<div class="ThresholdText">{{precise(metric.weight)}} %</div>
+														<mat-progress-bar class="progress-bar" mode="determinate" [value]="(quality_metrics[i]['Observations'][0].Value/quality_metrics[i].weight)*100"></mat-progress-bar>
 													</div>
-												</div>   
-												<div *ngIf="Fmetric['Observations'][0]['Value-Type']==='Boolean'">
-													<div style="float:right;" *ngIf="!ShowThresholds">{{boolValue(Fmetric['Observations'][0].Value)}}</div>
+												</div>
+												<div *ngIf="metric['Observations'][0]['Value-Type']==='Boolean'">
+													<div style="float:right;" *ngIf="!ShowThresholds">{{boolValue(metric['Observations'][0].Value)}}</div>
 													<div *ngIf="ShowThresholds">
-														<div style="float:left;"> {{boolValue(Fmetric['Observations'][0].Value)}} </div>
-														<div class="ThresholdText">{{boolValue(Fmetric.weight)}}</div>
-														<mat-progress-bar class="progress-bar" mode="determinate" [value]="booleanBar(Fmetric['Observations'][0].Value,Fmetric.weight)"></mat-progress-bar>
+														<div style="float:left;"> {{boolValue(metric['Observations'][0].Value)}} </div>
+														<div class="ThresholdText">{{boolValue(metric.weight)}}</div>
+														<mat-progress-bar class="progress-bar" mode="determinate" [value]="booleanBar(quality_metrics[i]['Observations'][0].Value,quality_metrics[i].weight)"></mat-progress-bar>
 													</div>
-												</div> 
-												<div *ngIf="Fmetric['Observations'][0]['Value-Type']==='Integer'">
-													<div style="float:right;" *ngIf="!ShowThresholds">{{Fmetric['Observations'][0].Value}}</div>
+												</div>
+												<div *ngIf="metric['Observations'][0]['Value-Type']==='Integer'">
+													<div style="float:right;" *ngIf="!ShowThresholds">{{metric['Observations'][0].Value}}</div>
 													<div *ngIf="ShowThresholds">
-														<div style="float:left;"> {{Fmetric['Observations'][0].Value}} </div>
-														<div class="ThresholdText">{{Fmetric.weight}}</div>
-														<mat-progress-bar class="progress-bar" mode="determinate" [value]="(Fmetric['Observations'][0].Value/Fmetric.weight)*100"></mat-progress-bar>
+														<div style="float:left;"> {{metric['Observations'][0].Value}} </div>
+														<div class="ThresholdText">{{metric.weight}}</div>
+														<mat-progress-bar class="progress-bar" mode="determinate" [value]="(quality_metrics[i]['Observations'][0].Value/quality_metrics[i].weight)*100"></mat-progress-bar>
 													</div>
-												</div>  
+												</div>
 											</h5>
 										</li>
 									</div>
-
-
-
-									<div *ngIf="Filteredmetrics.length==0">
-										<li><mat-error>No Metrics found equating Filter Options</mat-error></li>
-									</div>
+								</div>
+							</div>
+							<!--If we wish to show Filtered Metrics we hide all recent metrics-->
+							<div *ngIf="filterMetrics">
+								<div *ngFor="let Fmetric of Filteredmetrics; let s=index">
+									<li (click)="newMetricProfile(Fmetric)">
+										{{Fmetric['Metric-Label']}}
+										<h5>
+											<div *ngIf="Fmetric['Observations'][0]['Value-Type']==='Double'">
+												<div style="float:right;" *ngIf="!ShowThresholds">{{precise(Fmetric['Observations'][0].Value)}} % </div>
+												<div *ngIf="ShowThresholds">
+													<div style="float:left;"> {{precise(Fmetric['Observations'][0].Value)}} % </div>
+													<div class="ThresholdText">{{precise(Fmetric.weight)}} %</div>
+													<mat-progress-bar class="progress-bar" mode="determinate" [value]="(Fmetric['Observations'][0].Value/Fmetric.weight)*100"></mat-progress-bar>
+												</div>
+											</div>
+											<div *ngIf="Fmetric['Observations'][0]['Value-Type']==='Boolean'">
+												<div style="float:right;" *ngIf="!ShowThresholds">{{boolValue(Fmetric['Observations'][0].Value)}}</div>
+												<div *ngIf="ShowThresholds">
+													<div style="float:left;"> {{boolValue(Fmetric['Observations'][0].Value)}} </div>
+													<div class="ThresholdText">{{boolValue(Fmetric.weight)}}</div>
+													<mat-progress-bar class="progress-bar" mode="determinate" [value]="booleanBar(Fmetric['Observations'][0].Value,Fmetric.weight)"></mat-progress-bar>
+												</div>
+											</div>
+											<div *ngIf="Fmetric['Observations'][0]['Value-Type']==='Integer'">
+												<div style="float:right;" *ngIf="!ShowThresholds">{{Fmetric['Observations'][0].Value}}</div>
+												<div *ngIf="ShowThresholds">
+													<div style="float:left;"> {{Fmetric['Observations'][0].Value}} </div>
+													<div class="ThresholdText">{{Fmetric.weight}}</div>
+													<mat-progress-bar class="progress-bar" mode="determinate" [value]="(Fmetric['Observations'][0].Value/Fmetric.weight)*100"></mat-progress-bar>
+												</div>
+											</div>
+										</h5>
+									</li>
 								</div>
 
-							</ul>
-						</div>
-						<div class="Middle" *ngIf="showProfilePage">
-							<app-metric-profile></app-metric-profile> 
-						</div>
-					</div>
-				</ng-template>
-			</mat-tab>
-		</mat-tab-group>
-	</div>
 
+
+								<div *ngIf="Filteredmetrics.length==0">
+									<li>
+										<mat-error>No Metrics found equating Filter Options</mat-error>
+									</li>
+								</div>
+							</div>
+
+						</ul>
+					</div>
+					<div class="Middle" *ngIf="showProfilePage">
+						<app-metric-profile></app-metric-profile>
+					</div>
+				</div>
+			</ng-template>
+		</mat-tab>
+	</mat-tab-group>
+</div>

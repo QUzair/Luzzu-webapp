@@ -1,53 +1,52 @@
 <h1>Assessment</h1>
 <ul>
 	<li>
-		<div><h2>
-			Select Dataset to Assess <button (click)="Assess()" mat-fab color="primary" style="float: right;">Assess</button>
-		</h2></div>
+		<div>
+			<h2>
+				Select Dataset to Assess <button (click)="Assess()" mat-fab color="primary" style="float: right;">Assess</button>
+			</h2>
+		</div>
 	</li>
 </ul>
-		
+
 <ul>
 	<div class="row">
-				<div class="column">				
-						<li>
-							  <mat-form-field>
-							  	<input matInput placeholder="Dataset Location" [(ngModel)]="dslocation">
-							  </mat-form-field>
-						</li>
-						<li>
-							  <mat-form-field>
-							  	<input matInput placeholder="Dataset-PLD" [(ngModel)]="pld">
-							  </mat-form-field>
-						</li>
-						<li>
-							<mat-slide-toggle
-					          class="example-margin" [(ngModel)]="sparQlendpoint">
-					        Sparql Endpoint (True/False)
-					      </mat-slide-toggle>
-						</li>
-						<li>
-							<mat-slide-toggle
-					          class="example-margin" [(ngModel)]="problemReport">
-					        Output Problem Report 
-					      </mat-slide-toggle>
-						</li>
-				</div>
+		<div class="column">
+			<li>
+				<mat-form-field>
+					<input matInput placeholder="Dataset Location" [(ngModel)]="dslocation">
+				</mat-form-field>
+			</li>
+			<li>
+				<mat-form-field>
+					<input matInput placeholder="Dataset-PLD" [(ngModel)]="pld">
+				</mat-form-field>
+			</li>
+			<li>
+				<mat-slide-toggle class="example-margin" [(ngModel)]="sparQlendpoint">
+					Sparql Endpoint (True/False)
+				</mat-slide-toggle>
+			</li>
+			<li>
+				<mat-slide-toggle class="example-margin" [(ngModel)]="problemReport">
+					Output Problem Report
+				</mat-slide-toggle>
+			</li>
+		</div>
 
-				<div class="column">
-						<li>
-							<h4>Choose Metrics to Assess datasets over</h4>
-							<mat-form-field class="example-full-width">
-						  		<mat-select placeholder="Metrics" [(formControl)]="metricsForm" multiple>
-						    		<mat-option *ngFor="let metric of data" [value]="metric">{{metric.label}}</mat-option>
-						  		</mat-select>
-							</mat-form-field>
-							<div *ngFor="let m of metricsForm.value; let i=index">
-									<h4>{{m.label}}</h4><p>{{m.comment}}</p>
-							</div>
-						</li>
+		<div class="column">
+			<li>
+				<h4>Choose Metrics to Assess datasets over</h4>
+				<mat-form-field class="example-full-width">
+					<mat-select placeholder="Metrics" [(formControl)]="metricsForm" multiple>
+						<mat-option *ngFor="let metric of data" [value]="metric">{{metric.label}}</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<div *ngFor="let m of metricsForm.value; let i=index">
+					<h4>{{m.label}}</h4>
+					<p>{{m.comment}}</p>
 				</div>
+			</li>
+		</div>
 	</div>
 </ul>
-
-

@@ -45,7 +45,7 @@
 		</ul>
 	</div>
 
-	
+
 </div>
 
 <ul>
@@ -53,11 +53,11 @@
 		<div *ngFor="let dataset of NA_Dataset_Metrics">
 			{{dataset['Dataset-Label']}}
 			<div *ngFor="let metric of dataset.Metrics">
-				<li>
-					{{metric}}
-				</li>
-			</div>
-		</div>
+	<li>
+		{{metric}}
+	</li>
+	</div>
+	</div>
 	</li>
 	<li>
 		<h3>Radar Graph</h3>
@@ -80,7 +80,7 @@
 			<table matSort (matSortChange)="sortData($event)">
 				<tr>
 					<th mat-sort-header="Dataset-Label">Dataset Label</th>
-					<th  *ngFor="let metric of sortedData[0].Metrics" mat-sort-header={{metric.Label}}>
+					<th *ngFor="let metric of sortedData[0].Metrics" mat-sort-header={{metric.Label}}>
 						{{metric.Label}}
 					</th>
 				</tr>
@@ -95,4 +95,3 @@
 		</li>
 	</div>
 </ul>
-

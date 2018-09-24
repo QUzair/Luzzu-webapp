@@ -6,23 +6,23 @@ const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' })
 };
 
- interface RankOption{
+interface RankOption {
   RankName: string,
-  RankType:string,
+  RankType: string,
   Description: string,
   Weights: any[]
 }
 
 interface data {
-	Categories: Object[]
+  Categories: Object[]
 }
 
 interface MetricData {
   Category: string,
   Dimension: string,
-  'Metric-Label':string,
-  'Metric-URI':string,
-  Observations:any[]
+  'Metric-Label': string,
+  'Metric-URI': string,
+  Observations: any[]
 }
 
 interface RankedUsers {
@@ -35,17 +35,17 @@ interface assessdata {
 
 export class DATASET {
   constructor(public dataset: string, public graphUri: string, public rankedValue: number) {
-   }
+  }
 }
 
 export class LOD {
   constructor(public name: string, public comment: string, public mean: number, public std: number) {
-   }
+  }
 }
 
 export class MT {
   constructor(public dataset: string, public metrics: Object[]) {
-   }
+  }
 }
 
 @Injectable({
@@ -55,6 +55,12 @@ export class DataService {
 
   private rankedUsers = new BehaviorSubject([]);
   currentRankedUsers = this.rankedUsers.asObservable();
+
+  private rankedMetrics = new BehaviorSubject([]);
+  currentRankedMetrics = this.rankedMetrics.asObservable();
+
+  private RankOption = new BehaviorSubject([]);
+  currentRankOption = this.RankOption.asObservable();
 
   private Profile_Label = new BehaviorSubject('No label selected');
   Current_Label = this.Profile_Label.asObservable();
@@ -67,132 +73,133 @@ export class DataService {
 
   constructor(private http: HttpClient) { }
 
-  dat = {type:"",uri:"",weight:0};
+  dat = { type: "", uri: "", weight: 0 };
 
-  standardRank = [{"type":"category","uri":"http://purl.org/eis/vocab/dqm#Contextual","weight":0.25},{"type":"category","uri":"http://purl.org/eis/vocab/dqm#Accessibility","weight":0.25},{"type":"category","uri":"http://purl.org/eis/vocab/dqm#Representational","weight":0.25},{"type":"category","uri":"http://purl.org/eis/vocab/dqm#Intrinsic","weight":0.25}]
+  standardRank = [{ "type": "category", "uri": "http://purl.org/eis/vocab/dqm#Contextual", "weight": 0.25 }, { "type": "category", "uri": "http://purl.org/eis/vocab/dqm#Accessibility", "weight": 0.25 }, { "type": "category", "uri": "http://purl.org/eis/vocab/dqm#Representational", "weight": 0.25 }, { "type": "category", "uri": "http://purl.org/eis/vocab/dqm#Intrinsic", "weight": 0.25 }]
 
-  getRanks(body){
+  getRanks(body) {
     console.log(body)
-  	return this.http.post<Object[]>('http://0.0.0.0:8080/Luzzu/v4/dataset/rank/weighted',body)
+    return this.http.post<Object[]>('http://0.0.0.0:8080/Luzzu/v4/dataset/rank/weighted', body)
   }
 
   //http://localhost:8080/Luzzu/v4/dataset/rank
-//http://0.0.0.0:8080/Luzzu/v4/dataset/rank/weighted/
-	getFacets(){
-  	return this.http.get<data>('http://0.0.0.0:8080/Luzzu/v4/framework/filtering-facets/')
-	}
-
-	getRanking(){
-	return this.http.get<DATASET[]>("/assets/data/rankedDatasets1.json")
-	}
-
-  getLODdata(){
-  return this.http.get<LOD[]>("/assets/data/LODdata.json")
+  //http://0.0.0.0:8080/Luzzu/v4/dataset/rank/weighted/
+  getFacets() {
+    return this.http.get<data>('http://0.0.0.0:8080/Luzzu/v4/framework/filtering-facets/')
   }
 
-  getConfigurations(){
-  return this.http.get<Object[]>("/assets/data/Configurations.json")
+  getRanking() {
+    return this.http.get<DATASET[]>("/assets/data/rankedDatasets1.json")
   }
 
-  getMetricThresholdData(){
+  getLODdata() {
+    return this.http.get<LOD[]>("/assets/data/LODdata.json")
+  }
+
+  getConfigurations() {
+    return this.http.get<Object[]>("/assets/data/Configurations.json")
+  }
+
+  getMetricThresholdData() {
     return this.http.get<MT[]>("/assets/data/Metrics_Threshholds.json")
   }
 
-  getpending(){
+  getpending() {
     return this.http.get<assessdata>('http://localhost:8080/Luzzu/v4/assessment/pending')
   }
 
-  getfailed(){
+  getfailed() {
     return this.http.get<assessdata>('http://localhost:8080/Luzzu/v4/assessment/failed')
   }
 
-  getsuccessful(){
+  getsuccessful() {
     return this.http.get<assessdata>('http://localhost:8080/Luzzu/v4/assessment/successful')
   }
 
-   AssembleRequest(posts$,rankingType){
+  AssembleRequest(posts$, rankingType) {
     console.log(`starting ranking...`)
     console.log(posts$)
-    let request= []
+    let request = []
 
-    if(rankingType=='Categories'){
-      for(let c in posts$){ 
-        let dad = {type:"",uri:"",weight:0};
-        dad.type = "category" 
+    if (rankingType == 'Categories') {
+      for (let c in posts$) {
+        let dad = { type: "", uri: "", weight: 0 };
+        dad.type = "category"
         dad.uri = posts$[c].URI
         dad.weight = posts$[c].weight
         console.log(dad)
-        if(posts$[c].weight>0) request.push(dad)  
+        if (posts$[c].weight > 0) request.push(dad)
         console.log(request)
-       }
-     }
-    else if(rankingType=='Dimensions'){
-      for(let c in posts$){  
-          for(let d in posts$[c].Dimensions){ 
-            let da = {type:"",uri:"",weight:0};
-            da.type = "dimension"
-            da.uri = posts$[c].Dimensions[d].URI
-            da.weight = posts$[c].Dimensions[d].weight
+      }
+    }
+    else if (rankingType == 'Dimensions') {
+      for (let c in posts$) {
+        for (let d in posts$[c].Dimensions) {
+          let da = { type: "", uri: "", weight: 0 };
+          da.type = "dimension"
+          da.uri = posts$[c].Dimensions[d].URI
+          da.weight = posts$[c].Dimensions[d].weight
+          console.log(da)
+          request.push(da)
+          console.log(request)
+        }
+      }
+    }
+    else if (rankingType == 'Metrics') {
+      for (let c in posts$) {
+        for (let d in posts$[c].Dimensions) {
+          for (let m in posts$[c].Dimensions[d].Metrics) {
+            let da = { type: "", uri: "", weight: 0 };
+            da.type = "metric"
+            da.uri = posts$[c].Dimensions[d].Metrics[m].URI
+            da.weight = posts$[c].Dimensions[d].Metrics[m].weight
             console.log(da)
-            request.push(da)  
+            request.push(da)
             console.log(request)
           }
-       }
-     }
-    else if(rankingType=='Metrics'){
-      for(let c in posts$){  
-          for(let d in posts$[c].Dimensions){ 
-            for(let m in posts$[c].Dimensions[d].Metrics){
-              let da = {type:"",uri:"",weight:0};
-                da.type = "metric"
-                da.uri = posts$[c].Dimensions[d].Metrics[m].URI
-                da.weight = posts$[c].Dimensions[d].Metrics[m].weight
-                console.log(da)
-                request.push(da)  
-                console.log(request)
-            }
-          }
-       }
-     }
-     
-      console.log(request)
-      console.log("here")
-      console.log(JSON.stringify(request))
-      
+        }
+      }
+    }
+
+    console.log(request)
+    console.log("here")
+    console.log(JSON.stringify(request))
+
     //Send req
-      return this.getRanks(JSON.stringify(request)).subscribe((res)=>{
-        this.rankedUsers.next(res)
-        this.Users_Spinner.next(false)
-        console.log(this.rankedUsers)
-      })
-       
+    return this.getRanks(JSON.stringify(request)).subscribe((res) => {
+      this.rankedUsers.next(res)
+      this.RankOption.next(request)
+      this.Users_Spinner.next(false)
+      console.log(this.rankedUsers)
+    })
+
   }
 
-  SaveRankOption(posts$,rankType,rankName,rankDescription){
+  SaveRankOption(posts$, rankType, rankName, rankDescription) {
     console.log(posts$)
     console.log(rankType)
     console.log(rankName)
     console.log(rankDescription)
 
-    var temp:RankOption = {RankName:"Nothing",Description:"Also Nothing", RankType:"Categories",Weights:[]}
+    var temp: RankOption = { RankName: "Nothing", Description: "Also Nothing", RankType: "Categories", Weights: [] }
     let arr = []
-   // let temparr:{Label:string,Value:number} = {Label:"Nothing",Value:0}
+    // let temparr:{Label:string,Value:number} = {Label:"Nothing",Value:0}
 
-     if(rankType=="Categories"){
-      for(let c in posts$){  
-        if(posts$[c].weight>0){
-          let temparr:{Label:string,Value:number} = {Label:"Nothing",Value:0}
+    if (rankType == "Categories") {
+      for (let c in posts$) {
+        if (posts$[c].weight > 0) {
+          let temparr: { Label: string, Value: number } = { Label: "Nothing", Value: 0 }
           temparr.Label = posts$[c].Label
           temparr.Value = posts$[c].weight
           arr.push(temparr)
         }
       }
     }
-    else if(rankType=="Dimensions"){
-      for(let c in posts$){  
-        for(let d in posts$[c].Dimensions){
-          if(posts$[c].Dimensions[d].weight>0){
-            let temparr:{Label:string,Value:number} = {Label:"Nothing",Value:0}
+    else if (rankType == "Dimensions") {
+      for (let c in posts$) {
+        for (let d in posts$[c].Dimensions) {
+          if (posts$[c].Dimensions[d].weight > 0) {
+            let temparr: { Label: string, Value: number } = { Label: "Nothing", Value: 0 }
             temparr.Label = posts$[c].Dimensions[d].Label
             temparr.Value = posts$[c].Dimensions[d].weight
             arr.push(temparr)
@@ -200,12 +207,12 @@ export class DataService {
         }
       }
     }
-    else if(rankType=="Metrics"){
-      for(let c in posts$){  
-        for(let d in posts$[c].Dimensions){
-          for(let m in posts$[c].Dimensions[d].Metrics){
-            if(posts$[c].Dimensions[d].Metrics[m].weight>0){
-              let temparr:{Label:string,Value:number} = {Label:"Nothing",Value:0}
+    else if (rankType == "Metrics") {
+      for (let c in posts$) {
+        for (let d in posts$[c].Dimensions) {
+          for (let m in posts$[c].Dimensions[d].Metrics) {
+            if (posts$[c].Dimensions[d].Metrics[m].weight > 0) {
+              let temparr: { Label: string, Value: number } = { Label: "Nothing", Value: 0 }
               temparr.Label = posts$[c].Dimensions[d].Metrics[m].Label
               temparr.Value = posts$[c].Dimensions[d].Metrics[m].weight
               arr.push(temparr)
@@ -213,8 +220,8 @@ export class DataService {
           }
         }
       }
-    } 
-    console.log(arr) 
+    }
+    console.log(arr)
     temp.RankName = rankName
     temp.Description = rankDescription
     temp.RankType = rankType
@@ -228,55 +235,87 @@ export class DataService {
     this.Profile_Label.next(newLabel)
   }
 
-  changeMetricName(metric:any){
+  changeTableMetrics(metrics: any[]) {
+    this.rankedMetrics.next(metrics)
+  }
+
+  changeMetricName(metric: any) {
     console.log(metric)
     this.Metric_profile_name.next(metric)
   }
 
-  getStandardRanks(){
+  getStandardRanks() {
     return this.getRanks(this.standardRank)
   }
 
-  getProfileObservation(label,uri): Observable<any> {
-  const body = new HttpParams()
-    .set('Dataset-PLD', label)
-    .set('Observation',uri)
+  // /v4/export/toDQV/
 
-  return this.http.post('http://0.0.0.0:8080/Luzzu/v4/metric/observation/profile',
-    body.toString(),
-    {
-      headers: new HttpHeaders()
-        .set('Content-Type', 'application/x-www-form-urlencoded')
-    }
-  );
+  getProfileObservation(label, uri): Observable<any> {
+    const body = new HttpParams()
+      .set('Dataset-PLD', label)
+      .set('Observation', uri)
+
+    return this.http.post('http://0.0.0.0:8080/Luzzu/v4/metric/observation/profile',
+      body.toString(),
+      {
+        headers: new HttpHeaders()
+          .set('Content-Type', 'application/x-www-form-urlencoded')
+      }
+    );
   }
+
+
+  getDAQMetadata(label): Observable<any> {
+    const body = new HttpParams().set('Dataset-PLD', label)
+
+    return this.http.post('http://0.0.0.0:8080/Luzzu/v4/export/toDAQ/',
+      body.toString(),
+      {
+        headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
+        responseType: 'text'
+      }
+    );
+  }
+
+  getDQVMetadata(label): Observable<any> {
+    const body = new HttpParams().set('Dataset-PLD', label)
+
+    return this.http.post('http://0.0.0.0:8080/Luzzu/v4/export/toDQV/',
+      body.toString(),
+      {
+        headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
+        responseType: 'text'
+      }
+    );
+  }
+
 
   getAssessmentdates(label): Observable<any> {
-  const body = new HttpParams()
-    .set('Dataset-PLD', label);
+    const body = new HttpParams()
+      .set('Dataset-PLD', label);
 
-  return this.http.post('http://0.0.0.0:8080/Luzzu/v4/dataset/assessment-dates',
-    body.toString(),
-    {
-      headers: new HttpHeaders()
-        .set('Content-Type', 'application/x-www-form-urlencoded')
-    }
-  );
+    return this.http.post('http://0.0.0.0:8080/Luzzu/v4/dataset/assessment-dates',
+      body.toString(),
+      {
+        headers: new HttpHeaders()
+          .set('Content-Type', 'application/x-www-form-urlencoded')
+      }
+    );
   }
 
-    MetricsForDated(pld,date): Observable<any> {
-  const body = new HttpParams()
-    .set('Dataset-PLD', pld)
-    .set('Date',date);
+  MetricsForDated(pld, date): Observable<any> {
+    const body = new HttpParams()
+      .set('Dataset-PLD', pld)
+      .set('Date', date);
 
-  return this.http.post('http://0.0.0.0:8080/Luzzu/v4/dataset/quality/',
-    body.toString(),
-    {
-      headers: new HttpHeaders()
-        .set('Content-Type', 'application/x-www-form-urlencoded')
-    }
-  );
+    return this.http.post('http://0.0.0.0:8080/Luzzu/v4/dataset/quality/',
+      body.toString(),
+      {
+        headers: new HttpHeaders()
+          .set('Content-Type', 'application/x-www-form-urlencoded')
+      }
+    );
   }
 
-  }
+}
 

@@ -1,48 +1,68 @@
 <ul>
 	<li>
-		
- 		<h2>{{metric['Metric-Label']}}</h2>
- 		<p><strong>Category</strong> : {{metric['Category']}}</p>
- 		<p><strong>Dimension</strong> : {{metric['Dimension']}}</p>
- 		<p><strong>Type :</strong> {{metric['Observations'][0]['Value-Type']}}</p>
- 		<p><strong>Date Computed :</strong> {{metric['Observations'][0]['Date-Computed']}}</p>
- 		<p><strong>Graph-URI :</strong> {{metric['Observations'][0]['Graph-URI']}}</p>
- 		<p><strong>Metric Description :</strong><br> {{comment}}</p>
-
- 		<div *ngIf="ETU">
-	 		<p><strong>Estimation-Technique-Used : </strong>
-	 			<a class="ET-link" href="{{profileProperties['Estimation-Technique-Used']}}" disabled="!(profileProperties['Estimation-Technique-Used-ValueType']=='URI')" target="_blank"><span>{{profileProperties['Estimation-Technique-Used']}}</span></a>
-	 		</p>
-	 	</div>
-	 	<div *ngIf="EP">
-	 		<table>
-			  <tr>
-			    <td>Key</td>
-			    <td>Value</td>
-			  </tr>
-			 <tr *ngFor="let par of profileProperties['Estimation-Parameter']">	
-			    <td>   {{par.Key}}   </td>
-			    <td>   {{par.Value}} </td>
-			  </tr>
+		<!--Observation and Basic Info about Metric-->
+		<h2>{{metric['Metric-Label']}}</h2>
+		<p><strong>Category</strong> : {{metric['Category']}}</p>
+		<p><strong>Dimension</strong> : {{metric['Dimension']}}</p>
+		<p><strong>Type :</strong> {{metric['Observations'][0]['Value-Type']}}</p>
+		<p><strong>Date Computed :</strong> {{metric['Observations'][0]['Date-Computed']}}</p>
+		<p><strong>Graph-URI :</strong> {{metric['Observations'][0]['Graph-URI']}}</p>
+		<p><strong>Metric Description :</strong><br> {{comment}}</p>
+		<!--Link to Estimatation Method-->
+		<div *ngIf="ETU">
+			<p><strong>Estimation-Technique-Used : </strong>
+				<a class="ET-link" href="{{profileProperties['Estimation-Technique-Used']}}" disabled="!(profileProperties['Estimation-Technique-Used-ValueType']=='URI')"
+				 target="_blank"><span>{{profileProperties['Estimation-Technique-Used']}}</span></a>
+			</p>
+		</div>
+		<div *ngIf="EP">
+			<table>
+				<tr>
+					<td>Key</td>
+					<td>Value</td>
+				</tr>
+				<!--Table of Profiling Properties-->
+				<tr *ngFor="let par of profileProperties['Estimation-Parameter']">
+					<td> {{par.Key}} </td>
+					<td> {{par.Value}} </td>
+				</tr>
 			</table>
- 		</div>
+		</div>
 	</li>
 	<li>
 		<ul>
-							
 			<li>
+				<div *ngIf="Table[0]!=undefined">
+					<table>
+						<!--Table representing Ranked Above and Below Datasets' metric Values-->
+						<tr>
+							<th>Dataset </th>
+							<th>Rank Value</th>
+							<th>Metric Value</th>
+						</tr>
+						<tr *ngFor="let Tablemetric of Table">
+							<td [style.fontWeight]="FontWeight(Tablemetric)">{{Tablemetric['Dataset-Label']['Dataset-PLD']}}</td>
+							<td [style.fontWeight]="FontWeight(Tablemetric)">{{precise(Tablemetric['Dataset-Label']['Rank-Value']*100)}} %</td>
+							<td [style.fontWeight]="FontWeight(Tablemetric)">{{Tablemetric['Metric-Value']}}</td>
+						</tr>
+					</table>
+				</div>
+				<br>
+			</li>
+			<li>
+				<!--Progress, Time and Triples Chart-->
 				<div class="box">
-						<div [hidden]="!(metricType==='Boolean')">
-							<div class="BooleanVal" [style.color]="getStyle()">{{getBooleanString()}}</div>
-					  	</div>
-						<div [hidden]="this.metricType==='Boolean'" *ngIf="donut" class="Chart">
-							<h4>Quality</h4>
-					  		<canvas id="donut1">{{ donut }}</canvas>
-					  	</div>
-						<div [hidden]="hideTripleChart" *ngIf="barChart" class="Chart">
-								<h4>Triples Assessed</h4>
-								<canvas id="bar">{{barChart}}</canvas>
-						</div>
+					<div [hidden]="!(metricType==='Boolean')">
+						<div class="BooleanVal" [style.color]="getStyle()">{{getBooleanString()}}</div>
+					</div>
+					<div [hidden]="this.metricType==='Boolean'" *ngIf="donut" class="Chart">
+						<h4>Quality</h4>
+						<canvas id="donut1">{{ donut }}</canvas>
+					</div>
+					<div [hidden]="hideTripleChart" *ngIf="barChart" class="Chart">
+						<h4>Triples Assessed</h4>
+						<canvas id="bar">{{barChart}}</canvas>
+					</div>
 
 				</div>
 			</li>
@@ -55,15 +75,3 @@
 		</ul>
 	</li>
 </ul>
-
-
-
-
-
-
-
-
-
-
-
-

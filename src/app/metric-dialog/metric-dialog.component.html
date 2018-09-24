@@ -5,17 +5,17 @@
 			<div class="fields">
 				<div *ngIf="metric.Observations[0]['Value-Type']==='Double'">
 					<h3 class="Quality">{{metric['Metric-Label']}}</h3>
-					<mat-slider thumbLabel tickInterval="auto" min="0" [max]="100" step="1"  [(ngModel)]="metric.weight"></mat-slider>
+					<mat-slider thumbLabel tickInterval="auto" min="0" [max]="100" step="1" [(ngModel)]="metric.weight"></mat-slider>
 					{{metric.weight}}
 				</div>
 				<div *ngIf="metric.Observations[0]['Value-Type']==='Integer'">
 					<h3 class="Quality">{{metric['Metric-Label']}}</h3>
 					<mat-form-field class="example-full-width">
-						<input matInput  maxlength="11" placeholder="Integer Threshold" [(ngModel)]="metric.weight">
+						<input matInput maxlength="11" placeholder="Integer Threshold" [(ngModel)]="metric.weight">
 						<mat-hint align="end">{{metric.weight.length}} / 11</mat-hint>
-				    </mat-form-field>
+					</mat-form-field>
 					{{metric.weight}}
-					
+
 				</div>
 				<div *ngIf="metric.Observations[0]['Value-Type']==='Boolean'">
 					<h3 class="Quality">{{metric['Metric-Label']}}</h3>
@@ -26,10 +26,10 @@
 			<mat-divider></mat-divider>
 		</div>
 	</ul>
-</div>
+</div>s
 
 
 <div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()"> No Thanks </button>
-  <button mat-button [mat-dialog-close]="data.metrics" cdkFocusInitial> Ok </button>
+	<button mat-button (click)="onNoClick()"> No Thanks </button>
+	<button mat-button [mat-dialog-close]="data.metrics" cdkFocusInitial> Ok </button>
 </div>

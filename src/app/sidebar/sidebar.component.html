@@ -4,7 +4,7 @@
 			<li matTooltip="Home">
 				<a routerLink="" [class.activated]="currentUrl=='/'">
 					<i class="material-icons">home</i>
-					
+
 				</a>
 			</li>
 		</div>
@@ -12,7 +12,7 @@
 			<li matTooltip="Dataset Profiles">
 				<a routerLink="users" [class.activated]="currentUrl=='/users'">
 					<i class="material-icons" title="Datasets Page">supervised_user_circle</i>
-					
+
 				</a>
 			</li>
 		</div>
@@ -25,7 +25,7 @@
 			</li>
 		</div>
 		<div *ngIf="showVisualisation">
-			<li matTooltip="Visualisation" >
+			<li matTooltip="Visualisation">
 				<a routerLink="visualise" [class.activated]="currentUrl=='/visualise'">
 					<i class="material-icons">signal_cellular_alt</i>
 				</a>
@@ -49,4 +49,3 @@
 	</ul>
 
 </nav>
-
