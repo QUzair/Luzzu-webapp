@@ -52,6 +52,92 @@
 			</div>
 		</div>
 	</li>
+	<li>
+		<div *ngIf="filterMetrics">
+			<mat-expansion-panel>
+				<mat-expansion-panel-header>
+					<mat-panel-title>
+						Metric Filter
+					</mat-panel-title>
+					<mat-panel-description>
+						Select What type of Metrics you wish to view
+					</mat-panel-description>
+				</mat-expansion-panel-header>
+				<form>
+					<mat-form-field>
+						<mat-select placeholder="Categories" [formControl]="CategoriesF" multiple>
+							<mat-option *ngFor="let cat of CatList" [value]="cat">{{cat}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+					<br>
+					<mat-form-field>
+						<mat-select placeholder="Dimensions" [formControl]="DimensionsF" multiple>
+							<mat-optgroup *ngFor="let group of posts$" [label]="group.Label" [disabled]="exists(group.Label)">
+								<mat-option *ngFor="let dimen of group.Dimensions" [value]="dimen.Label">
+									{{dimen.Label}}
+								</mat-option>
+							</mat-optgroup>
+						</mat-select>
+					</mat-form-field>
+				</form>
+				<mat-divider></mat-divider>
+				<!--Double Filter Field-->
+				<div class="FilterFields">
+					<h3>Double</h3>
+					<mat-form-field>
+						<input matInput placeholder="Min Value" [formControl]="double_minForm">
+					</mat-form-field><br>
+					<mat-form-field>
+						<input matInput placeholder="Max Value" [formControl]="double_maxForm">
+					</mat-form-field>
+					<mat-error *ngIf="(double_maxForm.value-double_minForm.value)<0">
+						Minimum can not be greater than Maximum
+						Min: {{minForm.value}} Max: {{maxForm.value}} {{maxForm.value-minForm.value}}
+					</mat-error>
+					<mat-error *ngIf="!(double_minForm.value>=0 && double_maxForm.value<=100)">
+						Please enter value between 0 and 100
+					</mat-error>
+					<mat-error *ngIf="double_minForm.hasError('required')">
+						Min and Max Values are <strong>required</strong>
+					</mat-error>
+				</div>
+				<mat-divider></mat-divider>
+				<!--Integer Filter Field-->
+				<div class="FilterFields">
+					<h3>Integer</h3>
+					<mat-form-field>
+						<input matInput placeholder="Min Value" [formControl]="int_minForm">
+					</mat-form-field><br>
+					<mat-form-field>
+						<input matInput placeholder="Max Value" [formControl]="int_maxForm">
+					</mat-form-field>
+					<mat-error *ngIf="(int_maxForm.value-int_minForm.value)<0">
+						Minimum can not be greater than Maximum
+						Min: {{minForm.value}} Max: {{maxForm.value}} {{maxForm.value-minForm.value}}
+					</mat-error>
+					<mat-error *ngIf="!(int_minForm.value>=0 && int_maxForm.value<=100)">
+						Please enter value between 0 and 100
+					</mat-error>
+					<mat-error *ngIf="int_minForm.hasError('required')">
+						Min and Max Values are <strong>required</strong>
+					</mat-error>
+				</div>
+				<mat-divider></mat-divider>
+				<!--Boolean Filter Field-->
+				<div class="FilterFields">
+					<h3>Boolean</h3>
+					Boolean Values
+					<mat-slide-toggle class="selected-value" [(ngModel)]="ShowBooleansVal">
+						{{ShowBooleansVal}}
+					</mat-slide-toggle>
+				</div>
+
+
+				<mat-divider></mat-divider>
+				<div (click)="filter()"><i class="material-icons">filter_list</i> <button mat-button [disabled]="(double_maxForm.value-double_minForm.value)<0 || double_minForm.hasError('required')">Filter</button></div>
+			</mat-expansion-panel>
+		</div>
+	</li>
 </ul>
 <!--IF Syntax Error exists Anything below wont show-->
 <div [hidden]="Syntax_boolean">
@@ -146,90 +232,6 @@
 							Filter
 						</mat-slide-toggle>
 					</li>
-					<div *ngIf="filterMetrics">
-						<mat-expansion-panel>
-							<mat-expansion-panel-header>
-								<mat-panel-title>
-									Metric Filter
-								</mat-panel-title>
-								<mat-panel-description>
-									Select What type of Metrics you wish to view
-								</mat-panel-description>
-							</mat-expansion-panel-header>
-							<form>
-								<mat-form-field>
-									<mat-select placeholder="Categories" [formControl]="CategoriesF" multiple>
-										<mat-option *ngFor="let cat of CatList" [value]="cat">{{cat}}</mat-option>
-									</mat-select>
-								</mat-form-field>
-								<br>
-								<mat-form-field>
-									<mat-select placeholder="Dimensions" [formControl]="DimensionsF" multiple>
-										<mat-optgroup *ngFor="let group of posts$" [label]="group.Label" [disabled]="exists(group.Label)">
-											<mat-option *ngFor="let dimen of group.Dimensions" [value]="dimen.Label">
-												{{dimen.Label}}
-											</mat-option>
-										</mat-optgroup>
-									</mat-select>
-								</mat-form-field>
-							</form>
-							<mat-divider></mat-divider>
-							<!--Double Filter Field-->
-							<div class="FilterFields">
-								<h3>Double</h3>
-								<mat-form-field>
-									<input matInput placeholder="Min Value" [formControl]="double_minForm">
-								</mat-form-field><br>
-								<mat-form-field>
-									<input matInput placeholder="Max Value" [formControl]="double_maxForm">
-								</mat-form-field>
-								<mat-error *ngIf="(double_maxForm.value-double_minForm.value)<0">
-									Minimum can not be greater than Maximum
-									Min: {{minForm.value}} Max: {{maxForm.value}} {{maxForm.value-minForm.value}}
-								</mat-error>
-								<mat-error *ngIf="!(double_minForm.value>=0 && double_maxForm.value<=100)">
-									Please enter value between 0 and 100
-								</mat-error>
-								<mat-error *ngIf="double_minForm.hasError('required')">
-									Min and Max Values are <strong>required</strong>
-								</mat-error>
-							</div>
-							<mat-divider></mat-divider>
-							<!--Integer Filter Field-->
-							<div class="FilterFields">
-								<h3>Integer</h3>
-								<mat-form-field>
-									<input matInput placeholder="Min Value" [formControl]="int_minForm">
-								</mat-form-field><br>
-								<mat-form-field>
-									<input matInput placeholder="Max Value" [formControl]="int_maxForm">
-								</mat-form-field>
-								<mat-error *ngIf="(int_maxForm.value-int_minForm.value)<0">
-									Minimum can not be greater than Maximum
-									Min: {{minForm.value}} Max: {{maxForm.value}} {{maxForm.value-minForm.value}}
-								</mat-error>
-								<mat-error *ngIf="!(int_minForm.value>=0 && int_maxForm.value<=100)">
-									Please enter value between 0 and 100
-								</mat-error>
-								<mat-error *ngIf="int_minForm.hasError('required')">
-									Min and Max Values are <strong>required</strong>
-								</mat-error>
-							</div>
-							<mat-divider></mat-divider>
-							<!--Boolean Filter Field-->
-							<div class="FilterFields">
-								<h3>Boolean</h3>
-								Boolean Values
-								<mat-slide-toggle class="selected-value" [(ngModel)]="ShowBooleansVal">
-									{{ShowBooleansVal}}
-								</mat-slide-toggle>
-							</div>
-
-
-							<mat-divider></mat-divider>
-							<div (click)="filter()"><i class="material-icons">filter_list</i> <button mat-button [disabled]="(double_maxForm.value-double_minForm.value)<0 || double_minForm.hasError('required')">Filter</button></div>
-						</mat-expansion-panel>
-					</div>
 					<mat-divider></mat-divider>
 
 				</ul>
